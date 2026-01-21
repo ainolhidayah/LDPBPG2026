@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Perbelanjaan Peruntukan LDP-BPG 050202 (Live)</title>
+    <title>Dashboard Kewangan LDP (Live)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -34,7 +34,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Perbelanjaan Peruntukan LDP-BPG (Live)</h1>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard LDP (Live)</h1>
                     <p class="text-slate-500 font-medium">Data automatik dari Google Sheets Terkini</p>
                 </div>
             </div>
@@ -116,20 +116,23 @@
             <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
-                    <p class="text-sm text-slate-400 mt-1">Status penggunaan peruntukan mengikut aktiviti</p>
+                    <p class="text-sm text-slate-400 mt-1">Status dan butiran pelaksanaan program LDP</p>
                 </div>
                 <div class="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-500 uppercase tracking-widest border border-slate-100">
                     Mata Wang: RM
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left min-w-[1000px]">
                     <thead>
                         <tr class="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-[0.15em] border-b border-slate-100">
                             <th class="px-8 py-5">Nama Aktiviti / Program</th>
-                            <th class="px-8 py-5 text-right">Peruntukan</th>
-                            <th class="px-8 py-5 text-right text-rose-500">Perbelanjaan</th>
-                            <th class="px-8 py-5 text-right text-emerald-600">Baki</th>
+                            <th class="px-4 py-5 text-center">Tarikh Mula</th>
+                            <th class="px-4 py-5 text-center">Tarikh Akhir</th>
+                            <th class="px-4 py-5 text-center">Bil. Peserta</th>
+                            <th class="px-6 py-5 text-right">Peruntukan</th>
+                            <th class="px-6 py-5 text-right text-rose-500">Belanja</th>
+                            <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
                         </tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-slate-50">
@@ -196,13 +199,18 @@
                     const rows = parseCSV(text);
 
                     if (key === 'analisis') {
-                        liveData.analisis.warrant = {
-                            no: rows[0][2],
-                            details: `${rows[1][2]} | Tarikh: ${rows[0][1]}`,
-                            os21: cleanVal(rows[1][3]),
-                            os29: cleanVal(rows[1][4]),
-                            total: cleanVal(rows[1][5])
-                        };
+                        // Header & Warrant Info
+                        if (rows[0]) {
+                            liveData.analisis.warrant = {
+                                no: rows[0][2] || "-",
+                                details: `${rows[1] ? rows[1][2] : "-"} | Tarikh: ${rows[0][1] || "-"}`,
+                                os21: cleanVal(rows[1] ? rows[1][3] : "0"),
+                                os29: cleanVal(rows[1] ? rows[1][4] : "0"),
+                                total: cleanVal(rows[1] ? rows[1][5] : "0")
+                            };
+                        }
+                        
+                        // Program Summary (Specific rows for summary)
                         const items = [];
                         for(let i=4; i<7; i++) {
                             if(rows[i] && rows[i][2]) {
@@ -211,12 +219,17 @@
                                     alloc: cleanVal(rows[i][5]),
                                     spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]),
-                                    os29: cleanVal(rows[i][4])
+                                    os29: cleanVal(rows[i][4]),
+                                    startDate: "-", // Summary tab usually doesn't show specific dates
+                                    endDate: "-",
+                                    participants: "-"
                                 });
                             }
                         }
                         liveData.analisis.items = items;
                     } else {
+                        // Detailed Sheets (COE, Assessor, Lead)
+                        // Rows usually start from index 3 ( BIL 1 )
                         const items = [];
                         for(let i=3; i<rows.length; i++) {
                             if(rows[i] && rows[i][2] && cleanVal(rows[i][5]) > 0) {
@@ -225,7 +238,11 @@
                                     alloc: cleanVal(rows[i][5]),
                                     spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]),
-                                    os29: cleanVal(rows[i][4])
+                                    os29: cleanVal(rows[i][4]),
+                                    // Mapping columns for Date Start, Date End, Bil Pes (indices 12, 13, 14 based on CSV structure)
+                                    startDate: rows[i][12] || "-",
+                                    endDate: rows[i][13] || "-",
+                                    participants: rows[i][14] || "-"
                                 });
                             }
                         }
@@ -233,7 +250,6 @@
                     }
                 }
                 
-                // Set update timestamp
                 const now = new Date();
                 const formattedDate = now.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
                 const formattedTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -294,11 +310,14 @@
             document.getElementById('table-body').innerHTML = items.length ? items.map(i => `
                 <tr class="hover:bg-slate-50 transition-all group">
                     <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">${i.name}</td>
-                    <td class="px-8 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
-                    <td class="px-8 py-5 text-right font-bold text-rose-500">${formatRM(i.spent)}</td>
-                    <td class="px-8 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
+                    <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
+                    <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
+                    <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
+                    <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
+                    <td class="px-6 py-5 text-right font-bold text-rose-500">${formatRM(i.spent)}</td>
+                    <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
                 </tr>
-            `).join('') : `<tr><td colspan="4" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            `).join('') : `<tr><td colspan="7" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalOS21, totalOS29);
         }
