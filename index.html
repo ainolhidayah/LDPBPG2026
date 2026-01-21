@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Kewangan LDP BPG 2026</title>
     
-    <!-- Library Diperlukan -->
+    <!-- Enjin Visual (Mesti ada Internet) -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,32 +14,28 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
-        .loader { border-top-color: #3b82f6; animation: spinner 1s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50">
+<body>
 
-    <div id="loading-screen" class="flex flex-col h-screen items-center justify-center bg-white">
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-100 h-16 w-16 mb-4"></div>
-        <h2 class="text-slate-800 text-xl font-bold tracking-tight">Menghubungkan ke Google Sheets...</h2>
-        <p class="text-slate-400 text-sm italic">Sila pastikan anda mempunyai talian internet yang stabil.</p>
+    <!-- Skrin Loading Statik -->
+    <div id="fallback-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
+        <div class="spinner mb-4"></div>
+        <h2 class="text-slate-800 text-lg font-bold">Menyediakan Dashboard...</h2>
+        <p class="text-slate-400 text-sm">Jika paparan ini tidak hilang, sila pastikan anda membuka fail ini menggunakan Chrome/Edge dan mempunyai internet.</p>
     </div>
 
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
-        const { 
-            BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-            ResponsiveContainer, Cell, PieChart, Pie 
-        } = Recharts;
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, PieChart, Pie } = Recharts;
 
         // =================================================================================
-        // 🔧 KONFIGURASI LINK GOOGLE SHEET (LIVE CSV)
+        // 🔧 DATA LIVE DARI GOOGLE SHEETS ANDA
         // =================================================================================
         const SHEET_LINKS = {
             ANALISIS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=0&single=true&output=csv', 
@@ -50,14 +46,12 @@
             }
         };
 
-        const formatCurrency = (val) => {
-            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(val);
-        };
+        const formatCurrency = (val) => new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(val);
 
         const cleanNum = (str) => {
             if (!str) return 0;
-            // Buang RM, koma, tanda petik dan jarak
-            let cleaned = str.replace(/[RM,\s"]/g, "");
+            // Menghapuskan RM, koma, tanda petik, dan simbol lain
+            let cleaned = str.replace(/[RM,\s%"]/g, "");
             return parseFloat(cleaned) || 0;
         };
 
@@ -68,325 +62,229 @@
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
                 else current += char;
             }
-            result.push(current);
+            result.push(current.trim());
             return result;
         };
 
-        const parseCSV = (csvText, type) => {
-            if (!csvText) return [];
-            const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-            const data = [];
-            
-            if (type === 'analysis') {
-                // Data dalam tab Analisis bermula dari baris ke-5 (index 4)
-                for (let i = 4; i < lines.length; i++) {
-                    const row = robustSplit(lines[i]);
-                    if (row.length > 5 && !isNaN(parseInt(row[0])) && row[1].startsWith('SK')) {
-                        const p21 = cleanNum(row[3]);
-                        const p29 = cleanNum(row[4]);
-                        const b21 = cleanNum(row[6]); 
-                        const b29 = cleanNum(row[7]);
-                        data.push({
-                            kod: row[1], 
-                            program: row[2].replace(/"/g, ''),
-                            total_peruntukan: p21 + p29, 
-                            total_perbelanjaan: b21 + b29
-                        });
-                    }
-                }
-            } else if (type === 'program') {
-                // Data dalam tab Program bermula dari baris ke-4 (index 3)
-                for (let i = 3; i < lines.length; i++) {
-                    const row = robustSplit(lines[i]);
-                    if (row.length > 10 && !isNaN(parseInt(row[0])) && row[2]) {
-                        data.push({
-                            bil: row[0], 
-                            kod: row[1], 
-                            nama: row[2].replace(/"/g, ''),
-                            p_jum: cleanNum(row[5]), 
-                            b_jum: cleanNum(row[8]),
-                            tarikh: `${row[12] || ''} - ${row[13] || ''}`,
-                            bil_pes: row[14] || '0', 
-                            lokasi: row[15] || '-'
-                        });
-                    }
-                }
-            }
-            return data;
-        };
-
         function App() {
-            const [view, setView] = useState('summary'); 
             const [data, setData] = useState([]);
             const [detailData, setDetailData] = useState([]);
-            const [activeProgram, setActiveProgram] = useState(null);
+            const [view, setView] = useState('summary');
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
+            const [activeProgram, setActiveProgram] = useState("");
 
             useEffect(() => {
-                const timer = setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                }, 500);
-                fetchSummaryData();
-                return () => clearTimeout(timer);
+                // Padam skrin loading statik apabila React sudah sedia
+                const loader = document.getElementById('fallback-loading');
+                if (loader) loader.style.display = 'none';
+                fetchSummary();
             }, []);
 
-            const fetchSummaryData = async () => {
+            const fetchSummary = async () => {
                 setLoading(true);
                 setError(null);
                 try {
                     const response = await fetch(SHEET_LINKS.ANALISIS);
-                    if (!response.ok) throw new Error("Gagal mengambil data dari Google Sheets. Pastikan anda telah klik 'Publish to Web' sebagai CSV.");
+                    if (!response.ok) throw new Error("Gagal menyambung ke Google Sheets. Sila semak pautan 'Publish to Web'.");
                     const text = await response.text();
-                    const parsed = parseCSV(text, 'analysis');
-                    if (parsed.length === 0) throw new Error("Data tidak ditemui. Sila semak format baris dalam Google Sheet anda.");
+                    const lines = text.split(/\r?\n/).filter(l => l.trim());
+                    
+                    const parsed = [];
+                    lines.forEach((line) => {
+                        const row = robustSplit(line);
+                        // Kenalpasti baris data berdasarkan Kod SK
+                        if (row.length > 5 && row[1] && row[1].startsWith('SK')) {
+                            parsed.push({
+                                kod: row[1],
+                                program: row[2].replace(/"/g, ''),
+                                peruntukan: cleanNum(row[3]) + cleanNum(row[4]), // OS21 + OS29
+                                belanja: cleanNum(row[6]) + cleanNum(row[7]), // OS21 + OS29
+                            });
+                        }
+                    });
+
+                    if (parsed.length === 0) throw new Error("Data tidak ditemui. Pastikan tab 'ANALISIS' mempunyai data dari baris ke-5.");
                     setData(parsed);
-                } catch (e) { 
-                    setError(e.message);
+                } catch (err) {
+                    setError(err.message);
                 }
                 setLoading(false);
             };
 
-            const fetchProgramDetail = async (programName) => {
-                const link = SHEET_LINKS.PROGRAMS[programName];
-                if (!link) {
-                    alert("Pautan untuk program " + programName + " belum diletakkan di dalam kod.");
-                    return;
-                }
+            const fetchDetail = async (progName) => {
                 setLoading(true);
-                setActiveProgram(programName);
+                setActiveProgram(progName);
                 try {
+                    const link = SHEET_LINKS.PROGRAMS[progName];
+                    if (!link) throw new Error("Pautan program ini tidak ditemui.");
+                    
                     const response = await fetch(link);
                     const text = await response.text();
-                    const parsed = parseCSV(text, 'program');
+                    const lines = text.split(/\r?\n/).filter(l => l.trim());
+                    
+                    const parsed = [];
+                    lines.forEach((line) => {
+                        const row = robustSplit(line);
+                        // Baris data bermula dengan nombor BIL
+                        if (row.length > 10 && !isNaN(parseInt(row[0]))) {
+                            parsed.push({
+                                bil: row[0],
+                                nama: row[2].replace(/"/g, ''),
+                                p_jum: cleanNum(row[5]),
+                                b_jum: cleanNum(row[8]),
+                                tarikh: `${row[12]} - ${row[13]}`,
+                                pax: row[14],
+                                lokasi: row[15]
+                            });
+                        }
+                    });
                     setDetailData(parsed);
                     setView('detail');
-                } catch (e) { alert("Gagal memuatkan perincian program."); }
+                } catch (err) {
+                    alert(err.message);
+                }
                 setLoading(false);
             };
 
-            const totalP = data.reduce((a, c) => a + c.total_peruntukan, 0);
-            const totalB = data.reduce((a, c) => a + c.total_perbelanjaan, 0);
+            const totalP = data.reduce((a, b) => a + b.peruntukan, 0);
+            const totalB = data.reduce((a, b) => a + b.belanja, 0);
 
-            if (loading && view === 'summary' && data.length === 0) return (
-                <div className="flex flex-col h-screen items-center justify-center bg-white text-slate-500">
-                    <div className="loader rounded-full border-4 border-slate-100 h-16 w-16 mb-4"></div>
-                    <p className="font-bold tracking-tight">Menyambung ke data live...</p>
+            if (error) return (
+                <div className="flex flex-col items-center justify-center h-screen p-6 text-center">
+                    <div className="bg-white p-8 rounded-3xl shadow-xl border-2 border-red-100 max-w-md">
+                        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+                        <h2 className="text-xl font-bold mb-2">Ralat Data</h2>
+                        <p className="text-slate-500 text-sm mb-6">{error}</p>
+                        <button onClick={fetchSummary} className="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition">Cuba Lagi</button>
+                    </div>
                 </div>
             );
 
             return (
-                <div className="p-4 md:p-10 max-w-7xl mx-auto min-h-screen">
-                    {/* Header Section */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                <div className="max-w-7xl mx-auto p-4 md:p-10">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                         <div>
-                            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                                DASHBOARD KEWANGAN LDP 2026
-                            </h1>
-                            <div className="flex items-center gap-2 mt-3 bg-white px-3 py-1 rounded-full border w-fit shadow-sm">
-                                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Disambung Terus ke Google Sheets</p>
-                            </div>
+                            <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Dashboard Kewangan LDP 2026</h1>
+                            <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">Institut Aminuddin Baki • Data Live</p>
                         </div>
-                        <div className="flex gap-3 w-full md:w-auto">
+                        <div className="flex gap-2 w-full md:w-auto">
                             {view === 'detail' && (
-                                <button 
-                                    onClick={() => setView('summary')} 
-                                    className="flex-1 md:flex-none bg-white border-2 border-slate-200 text-slate-800 px-6 py-3 rounded-2xl hover:bg-slate-50 transition-all text-xs font-black shadow-sm active:scale-95"
-                                >
-                                    &larr; BALIK KE UTAMA
-                                </button>
+                                <button onClick={() => setView('summary')} className="flex-1 md:flex-none bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">&larr; Balik</button>
                             )}
-                            <button 
-                                onClick={fetchSummaryData} 
-                                className="flex-1 md:flex-none bg-slate-900 text-white px-8 py-3 rounded-2xl hover:bg-slate-800 transition-all text-xs font-black shadow-lg shadow-slate-200 flex items-center justify-center gap-2 active:scale-95"
-                            >
-                                🔄 REFRESH DATA
-                            </button>
+                            <button onClick={fetchSummary} className="flex-1 md:flex-none bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-bold shadow-lg shadow-blue-200">🔄 Refresh</button>
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="bg-red-50 border-2 border-red-100 text-red-800 p-8 rounded-3xl mb-10 shadow-sm animate-fade-in">
-                            <h3 className="font-black flex items-center gap-3 mb-3 text-lg">
-                                <span className="bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">!</span> 
-                                Gagal Memuatkan Data
-                            </h3>
-                            <p className="text-sm font-medium opacity-80 mb-4">{error}</p>
-                            <div className="p-4 bg-white/60 rounded-2xl text-[11px] font-bold text-red-600 border border-red-100 italic">
-                                Sila pastikan anda telah mengikuti langkah "File > Share > Publish to web" dan memilih format "CSV" untuk setiap tab di Google Sheets.
-                            </div>
-                        </div>
-                    )}
-
                     {view === 'summary' ? (
-                        <div className="animate-fade-in">
-                            {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl hover:shadow-blue-500/5 transition-all">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        </div>
-                                        <span className="text-[10px] font-black text-blue-400 bg-blue-50 px-2 py-1 rounded-lg">LIVE</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Peruntukan Dipohon</p>
-                                    <h2 className="text-3xl font-black text-slate-800 tracking-tighter">{formatCurrency(totalP)}</h2>
+                        <div className="space-y-8">
+                            {/* Kad Ringkasan */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+                                    <p className="text-[10px] text-slate-400 font-black uppercase mb-1">Peruntukan Dipohon</p>
+                                    <h2 className="text-2xl font-black text-blue-600">{formatCurrency(totalP)}</h2>
                                 </div>
-
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl hover:shadow-orange-500/5 transition-all">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                        </div>
-                                        <span className="text-[10px] font-black text-orange-400 bg-orange-50 px-2 py-1 rounded-lg">AKTIF</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Perbelanjaan Semasa</p>
-                                    <h2 className="text-3xl font-black text-slate-800 tracking-tighter">{formatCurrency(totalB)}</h2>
+                                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+                                    <p className="text-[10px] text-slate-400 font-black uppercase mb-1">Perbelanjaan Semasa</p>
+                                    <h2 className="text-2xl font-black text-orange-500">{formatCurrency(totalB)}</h2>
                                 </div>
-
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl hover:shadow-emerald-500/5 transition-all">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        </div>
-                                        <span className="text-[10px] font-black text-emerald-400 bg-emerald-50 px-2 py-1 rounded-lg">BAKI</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Baki Peruntukan</p>
-                                    <h2 className="text-3xl font-black text-slate-800 tracking-tighter">{formatCurrency(totalP - totalB)}</h2>
+                                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+                                    <p className="text-[10px] text-slate-400 font-black uppercase mb-1">Baki Bersih</p>
+                                    <h2 className="text-2xl font-black text-emerald-600">{formatCurrency(totalP - totalB)}</h2>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
-                                {/* Chart Section */}
-                                <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100">
-                                    <div className="flex justify-between items-center mb-10">
-                                        <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest">📊 Prestasi Kewangan</h3>
-                                        <p className="text-[10px] font-bold text-slate-400 italic">Nilai dlm RM</p>
-                                    </div>
-                                    <div className="h-80 w-full">
-                                        <ResponsiveContainer>
-                                            <BarChart data={data}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                <XAxis dataKey="kod" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 900}} />
-                                                <YAxis hide />
-                                                <Tooltip 
-                                                    cursor={{fill: '#f8fafc'}}
-                                                    contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', padding: '16px'}}
-                                                    itemStyle={{fontWeight: 900, fontSize: '12px'}}
-                                                />
-                                                <Bar dataKey="total_peruntukan" name="Peruntukan" fill="#3b82f6" radius={[8, 8, 0, 0]} barSize={35} />
-                                                <Bar dataKey="total_perbelanjaan" name="Belanja" fill="#f97316" radius={[8, 8, 0, 0]} barSize={35} />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </div>
-
-                                {/* Main Table Section */}
-                                <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-                                    <div className="p-8 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                                        <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest">📋 Senarai Program Induk</h3>
-                                        <span className="text-[10px] font-black bg-blue-600 text-white px-3 py-1.5 rounded-xl">{data.length} MODUL</span>
-                                    </div>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-[11px]">
-                                            <thead className="text-slate-400 font-black uppercase tracking-[0.2em] bg-slate-50/50">
-                                                <tr>
-                                                    <th className="p-6">Kod</th>
-                                                    <th className="p-6">Nama Program</th>
-                                                    <th className="p-6 text-right">Baki</th>
-                                                    <th className="p-6"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-50">
-                                                {data.map((item, i) => (
-                                                    <tr key={i} className="group hover:bg-blue-50/40 transition-all">
-                                                        <td className="p-6 font-black text-slate-900 group-hover:text-blue-600 transition-colors">{item.kod}</td>
-                                                        <td className="p-6 text-slate-500 font-bold leading-relaxed">{item.program}</td>
-                                                        <td className="p-6 text-right font-black text-emerald-600">{formatCurrency(item.total_peruntukan - item.total_perbelanjaan)}</td>
-                                                        <td className="p-6 text-center">
-                                                            <button 
-                                                                onClick={() => fetchProgramDetail(item.program)} 
-                                                                className="bg-slate-100 text-slate-700 px-5 py-2.5 rounded-2xl font-black uppercase tracking-tighter hover:bg-slate-900 hover:text-white transition-all shadow-sm active:scale-90"
-                                                            >
-                                                                DETAIL
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="animate-fade-in">
-                            {/* Detail View Section */}
-                            <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl mb-10 flex flex-col md:flex-row justify-between items-center gap-8 border-b-[10px] border-blue-600">
-                                <div className="text-center md:text-left">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 mb-2">Perincian Kursus / Bengkel</p>
-                                    <h2 className="text-3xl font-black text-white tracking-tighter leading-tight max-w-2xl">{activeProgram}</h2>
-                                </div>
-                                <div className="flex gap-10 bg-white/5 p-6 rounded-[2rem] border border-white/10 backdrop-blur-md">
-                                    <div className="text-center">
-                                        <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Budget Modul</p>
-                                        <p className="font-black text-blue-400 text-xl tracking-tighter">{formatCurrency(detailData.reduce((a,c)=>a+c.p_jum,0))}</p>
-                                    </div>
-                                    <div className="w-px h-10 bg-white/10 my-auto"></div>
-                                    <div className="text-center">
-                                        <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Total Belanja</p>
-                                        <p className="font-black text-orange-400 text-xl tracking-tighter">{formatCurrency(detailData.reduce((a,c)=>a+c.b_jum,0))}</p>
-                                    </div>
+                            {/* Graf Bar */}
+                            <div className="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
+                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Prestasi Kewangan Mengikut Kod</h3>
+                                <div className="h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={data}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                            <XAxis dataKey="kod" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
+                                            <YAxis hide />
+                                            <Tooltip contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px rgba(0,0,0,0.05)'}} />
+                                            <Bar dataKey="peruntukan" name="Peruntukan" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={30} />
+                                            <Bar dataKey="belanja" name="Belanja" fill="#f97316" radius={[6, 6, 0, 0]} barSize={30} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+                            {/* Jadual Utama */}
+                            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                                <div className="p-6 bg-slate-50 border-b border-slate-100">
+                                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest text-center md:text-left">Senarai Program Induk</h3>
+                                </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-[11px]">
-                                        <thead className="bg-slate-50 text-slate-400 font-black uppercase tracking-[0.2em] border-b border-slate-100">
-                                            <tr>
-                                                <th className="p-6">Bil</th>
-                                                <th className="p-6">Nama Kursus / Bengkel</th>
-                                                <th className="p-6 text-right">Peruntukan</th>
-                                                <th className="p-6 text-right">Perbelanjaan</th>
-                                                <th className="p-6 text-center">Lokasi</th>
-                                                <th className="p-6 text-center">Peserta</th>
+                                        <thead>
+                                            <tr className="text-slate-400 font-black uppercase border-b bg-slate-50/50">
+                                                <th className="p-5">Kod</th>
+                                                <th className="p-5">Program</th>
+                                                <th className="p-5 text-right">Peruntukan</th>
+                                                <th className="p-5 text-right">Belanja</th>
+                                                <th className="p-5 text-center">Tindakan</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
-                                            {detailData.length > 0 ? detailData.map((item, i) => (
-                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                    <td className="p-6 text-slate-300 font-black">{item.bil}</td>
-                                                    <td className="p-6 font-black text-slate-800 max-w-sm leading-relaxed">{item.nama}</td>
-                                                    <td className="p-6 text-right font-black text-blue-600">{formatCurrency(item.p_jum)}</td>
-                                                    <td className="p-6 text-right font-black text-orange-600">{formatCurrency(item.b_jum)}</td>
-                                                    <td className="p-6 text-center text-slate-500 font-bold uppercase text-[10px] tracking-tight">{item.lokasi}</td>
-                                                    <td className="p-6 text-center">
-                                                        <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg font-black">{item.bil_pes}</span>
+                                            {data.map((item, i) => (
+                                                <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                                                    <td className="p-5 font-black text-slate-800">{item.kod}</td>
+                                                    <td className="p-5 text-slate-500 font-bold max-w-xs">{item.program}</td>
+                                                    <td className="p-5 text-right font-black text-blue-600">{formatCurrency(item.peruntukan)}</td>
+                                                    <td className="p-5 text-right font-black text-orange-500">{formatCurrency(item.belanja)}</td>
+                                                    <td className="p-5 text-center">
+                                                        <button onClick={() => fetchDetail(item.program)} className="bg-slate-100 text-slate-800 px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-slate-900 hover:text-white transition-all active:scale-90">Perincian</button>
                                                     </td>
                                                 </tr>
-                                            )) : (
-                                                <tr>
-                                                    <td colSpan="6" className="p-20 text-center text-slate-400 italic font-black text-lg bg-slate-50/50">
-                                                        Memuatkan data atau pautan tidak sah...
-                                                    </td>
-                                                </tr>
-                                            )}
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
+                    ) : (
+                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                            <div className="p-8 bg-slate-900 text-white">
+                                <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">Melihat Perincian Program</p>
+                                <h2 className="text-xl font-black">{activeProgram}</h2>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-[11px]">
+                                    <thead className="bg-slate-100 text-slate-400 font-black uppercase border-b">
+                                        <tr>
+                                            <th className="p-5">Bil</th>
+                                            <th className="p-5">Kursus / Bengkel</th>
+                                            <th className="p-5 text-right">Peruntukan</th>
+                                            <th className="p-5 text-right">Belanja</th>
+                                            <th className="p-5 text-center">Tarikh</th>
+                                            <th className="p-5 text-center">Peserta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {detailData.map((item, i) => (
+                                            <tr key={i} className="hover:bg-slate-50">
+                                                <td className="p-5 text-slate-400 font-bold">{item.bil}</td>
+                                                <td className="p-5 font-bold text-slate-800 max-w-sm">{item.nama}</td>
+                                                <td className="p-5 text-right font-bold text-blue-600">{formatCurrency(item.p_jum)}</td>
+                                                <td className="p-5 text-right font-bold text-orange-600">{formatCurrency(item.b_jum)}</td>
+                                                <td className="p-5 text-center text-slate-500 font-medium">{item.tarikh}</td>
+                                                <td className="p-5 text-center font-black text-slate-700">{item.pax}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     )}
-                    
+
                     <footer className="mt-20 mb-10 text-center">
-                        <p className="text-slate-300 text-[9px] uppercase tracking-[0.5em] font-black italic">
-                            IAB INTEGRATED FINANCIAL DASHBOARD v2.5 • REAL-TIME DATA CONNECTED
-                        </p>
+                        <p className="text-slate-300 text-[10px] font-black uppercase tracking-[0.5em] italic">IAB INTEGRATED FINANCIAL DASHBOARD v3.0</p>
                     </footer>
                 </div>
             );
