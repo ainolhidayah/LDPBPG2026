@@ -45,7 +45,7 @@
             <div class="flex items-center gap-4">
                 <div class="bg-blue-600 p-3 rounded-2xl">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                 </div>
                 <div>
@@ -109,7 +109,7 @@
                     <h3 class="text-lg font-bold text-slate-800">Peruntukan vs Belanja</h3>
                     <div class="flex gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                         <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-600 rounded-full"></span> Bajet</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-rose-500 rounded-full"></span> Belanja</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-slate-900 rounded-full"></span> Belanja</span>
                     </div>
                 </div>
                 <div class="chart-container">
@@ -149,17 +149,10 @@
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left min-w-[1100px]">
+                <table class="w-full text-left" id="main-table">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-[0.15em] border-b border-slate-100">
-                            <th class="px-8 py-5">Nama Aktiviti / Program</th>
-                            <th class="px-4 py-5 text-center">Tarikh Mula</th>
-                            <th class="px-4 py-5 text-center">Tarikh Akhir</th>
-                            <th class="px-4 py-5 text-center">Bil. Peserta</th>
-                            <th class="px-4 py-5 text-center">Lokasi</th>
-                            <th class="px-6 py-5 text-right">Peruntukan</th>
-                            <th class="px-6 py-5 text-right text-rose-500">Belanja</th>
-                            <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
+                        <tr class="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-[0.15em] border-b border-slate-100" id="table-header-row">
+                            <!-- Dynamic Header -->
                         </tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-slate-50">
@@ -304,10 +297,21 @@
         function updateUI() {
             const current = liveData[activeTabKey];
             const items = current.items || [];
+            const isAnalisis = activeTabKey === 'analisis';
             
+            // Adjust table min-width based on columns
+            const mainTable = document.getElementById('main-table');
+            if (isAnalisis) {
+                mainTable.classList.remove('min-w-[1100px]');
+                mainTable.classList.add('min-w-[800px]');
+            } else {
+                mainTable.classList.add('min-w-[1100px]');
+                mainTable.classList.remove('min-w-[800px]');
+            }
+
             // Warrant Section
             const warrantSec = document.getElementById('warrant-section');
-            if (activeTabKey === 'analisis' && liveData.analisis.warrant) {
+            if (isAnalisis && liveData.analisis.warrant) {
                 const w = liveData.analisis.warrant;
                 warrantSec.classList.remove('hidden');
                 document.getElementById('warrant-no').innerText = w.no;
@@ -345,7 +349,7 @@
                 </div>
                 <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Belanja Sebenar</p>
-                    <h3 class="text-2xl font-black text-rose-500">${formatRM(totalSpent)}</h3>
+                    <h3 class="text-2xl font-black text-slate-900">${formatRM(totalSpent)}</h3>
                 </div>
                 <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Baki Peruntukan</p>
@@ -355,6 +359,20 @@
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi Belanja</p>
                     <h3 class="text-2xl font-black ${perfColor.text}">${perc}%</h3>
                 </div>
+            `;
+
+            // Update Table Header
+            document.getElementById('table-header-row').innerHTML = `
+                <th class="px-8 py-5">Nama Aktiviti / Program</th>
+                ${!isAnalisis ? `
+                    <th class="px-4 py-5 text-center">Tarikh Mula</th>
+                    <th class="px-4 py-5 text-center">Tarikh Akhir</th>
+                    <th class="px-4 py-5 text-center">Bil. Peserta</th>
+                    <th class="px-4 py-5 text-center">Lokasi</th>
+                ` : ''}
+                <th class="px-6 py-5 text-right">Peruntukan</th>
+                <th class="px-6 py-5 text-right text-slate-900">Belanja</th>
+                <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
             `;
 
             document.getElementById('table-title').innerText = current.title;
@@ -372,12 +390,14 @@
                                 </span>
                             </div>
                         </td>
-                        <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
-                        <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
-                        <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
-                        <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
+                        ${!isAnalisis ? `
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
+                            <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
+                        ` : ''}
                         <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
-                        <td class="px-6 py-5 text-right font-bold text-rose-500">
+                        <td class="px-6 py-5 text-right font-bold text-slate-900">
                             ${formatRM(i.spent)}
                             <div class="text-[9px] font-bold ${itemColor.text} hidden lg:block uppercase tracking-tighter">
                                 ${itemPerc}% Prestasi
@@ -386,7 +406,7 @@
                         <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
                     </tr>
                 `;
-            }).join('') : `<tr><td colspan="8" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            }).join('') : `<tr><td colspan="${isAnalisis ? 4 : 8}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalOS21, totalOS29);
         }
@@ -401,7 +421,7 @@
                     labels: items.map(i => i.name.length > 20 ? i.name.substring(0, 17) + "..." : i.name),
                     datasets: [
                         { label: 'Peruntukan', data: items.map(i => i.alloc), backgroundColor: '#2563eb', borderRadius: 10, barThickness: 30 },
-                        { label: 'Belanja', data: items.map(i => i.spent), backgroundColor: '#f43f5e', borderRadius: 10, barThickness: 30 }
+                        { label: 'Belanja', data: items.map(i => i.spent), backgroundColor: '#1e293b', borderRadius: 10, barThickness: 30 }
                     ]
                 },
                 options: {
