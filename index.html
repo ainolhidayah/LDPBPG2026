@@ -99,11 +99,10 @@
         </div>
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="kpi-container"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-10" id="kpi-container"></div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-            <!-- Dynamic Chart (Line for Analysis, Horizontal Bar for Programs) -->
             <div class="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="text-lg font-bold text-slate-800" id="chart-main-title">Prestasi Peruntukan vs Belanja</h3>
@@ -248,6 +247,7 @@
                                     spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]),
                                     os29: cleanVal(rows[i][4]),
+                                    warrantBalance: cleanVal(rows[i][13]), // Added new column mapping (Index 13)
                                     startDate: "-", endDate: "-", participants: "-", location: "-"
                                 });
                             }
@@ -294,10 +294,10 @@
             const mainTable = document.getElementById('main-table');
             if (isAnalisis) {
                 mainTable.classList.remove('min-w-[1100px]');
-                mainTable.classList.add('min-w-[800px]');
+                mainTable.classList.add('min-w-[900px]');
             } else {
                 mainTable.classList.add('min-w-[1100px]');
-                mainTable.classList.remove('min-w-[800px]');
+                mainTable.classList.remove('min-w-[900px]');
             }
 
             const warrantSec = document.getElementById('warrant-section');
@@ -329,23 +329,32 @@
             const perc = totalAlloc > 0 ? (totalSpent/totalAlloc*100).toFixed(1) : 0;
             const perfColor = getPerformanceColor(parseFloat(perc));
 
+            // Logic for Warrant Balance after all allocations
+            const lastWarrantBalance = items.length > 0 && isAnalisis ? items[items.length - 1].warrantBalance : 0;
+
             document.getElementById('kpi-container').innerHTML = `
-                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Bajet Program</p>
-                    <h3 class="text-2xl font-black text-blue-600">${formatRM(totalAlloc)}</h3>
+                    <h3 class="text-xl font-black text-blue-600">${formatRM(totalAlloc)}</h3>
                 </div>
-                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Belanja Sebenar</p>
-                    <h3 class="text-2xl font-black text-slate-900">${formatRM(totalSpent)}</h3>
+                    <h3 class="text-xl font-black text-slate-900">${formatRM(totalSpent)}</h3>
                 </div>
-                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Baki Peruntukan</p>
-                    <h3 class="text-2xl font-black text-emerald-600">${formatRM(balance)}</h3>
+                    <h3 class="text-xl font-black text-emerald-600">${formatRM(balance)}</h3>
                 </div>
-                <div class="${perfColor.bg} p-8 rounded-3xl border ${perfColor.border} shadow-sm text-center transition-all duration-500">
+                <div class="${perfColor.bg} p-6 rounded-3xl border ${perfColor.border} shadow-sm text-center transition-all duration-500">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi Belanja</p>
-                    <h3 class="text-2xl font-black ${perfColor.text}">${perc}%</h3>
+                    <h3 class="text-xl font-black ${perfColor.text}">${perc}%</h3>
                 </div>
+                ${isAnalisis ? `
+                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 shadow-sm text-center">
+                    <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Baki Waran Tersedia</p>
+                    <h3 class="text-xl font-black text-blue-800">${formatRM(lastWarrantBalance)}</h3>
+                </div>
+                ` : ''}
             `;
 
             document.getElementById('table-header-row').innerHTML = `
@@ -353,7 +362,8 @@
                 ${!isAnalisis ? `<th class="px-4 py-5 text-center">Tarikh Mula</th><th class="px-4 py-5 text-center">Tarikh Akhir</th><th class="px-4 py-5 text-center">Bil. Peserta</th><th class="px-4 py-5 text-center">Lokasi</th>` : ''}
                 <th class="px-6 py-5 text-right">Peruntukan</th>
                 <th class="px-6 py-5 text-right text-slate-900">Belanja</th>
-                <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
+                <th class="px-6 py-5 text-right text-emerald-600">Baki Peruntukan</th>
+                ${isAnalisis ? `<th class="px-6 py-5 text-right text-blue-700 bg-blue-50/50">Baki Waran</th>` : ''}
             `;
 
             document.getElementById('table-title').innerText = current.title;
@@ -364,19 +374,15 @@
                     <tr class="hover:bg-slate-50 transition-all group">
                         <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
                             ${i.name}
-                            <div class="mt-1 flex items-center gap-2 lg:hidden">
-                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${itemColor.bg} ${itemColor.text} border ${itemColor.border}">
-                                    ${itemPerc}% Belanja
-                                </span>
-                            </div>
                         </td>
                         ${!isAnalisis ? `<td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td><td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td><td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td><td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>` : ''}
                         <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
-                        <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}<div class="text-[9px] font-bold ${itemColor.text} hidden lg:block uppercase tracking-tighter">${itemPerc}% Prestasi</div></td>
+                        <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
                         <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
+                        ${isAnalisis ? `<td class="px-6 py-5 text-right font-black text-blue-700 bg-blue-50/30">${formatRM(i.warrantBalance)}</td>` : ''}
                     </tr>
                 `;
-            }).join('') : `<tr><td colspan="${isAnalisis ? 4 : 8}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            }).join('') : `<tr><td colspan="${isAnalisis ? 5 : 8}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalOS21, totalOS29);
         }
@@ -389,7 +395,6 @@
             const ctxMain = document.getElementById('mainChart').getContext('2d');
             
             if (isAnalisis) {
-                // LINE CHART FOR ANALYSIS
                 mainChart = new Chart(ctxMain, {
                     type: 'line',
                     data: {
@@ -405,7 +410,6 @@
                     }
                 });
             } else {
-                // HORIZONTAL BAR CHART FOR PROGRAMS (Thick bars)
                 mainChart = new Chart(ctxMain, {
                     type: 'bar',
                     data: {
@@ -416,7 +420,7 @@
                         ]
                     },
                     options: {
-                        indexAxis: 'y', // Makes it horizontal
+                        indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
@@ -428,7 +432,6 @@
                 });
             }
 
-            // PIE CHART
             const ctxPie = document.getElementById('pieChart').getContext('2d');
             pieChart = new Chart(ctxPie, {
                 type: 'doughnut',
