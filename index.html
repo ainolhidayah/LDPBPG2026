@@ -38,12 +38,15 @@
                     <p class="text-slate-500 font-medium">Data automatik dari Google Sheets Terkini</p>
                 </div>
             </div>
-            <button onclick="fetchAllData()" class="flex items-center gap-2 bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-xl active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Kemaskini Sekarang
-            </button>
+            <div class="flex flex-col items-end gap-2">
+                <button onclick="fetchAllData()" class="flex items-center gap-2 bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-xl active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Kemaskini Sekarang
+                </button>
+                <p id="update-timestamp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-2 italic">Belum dikemas kini</p>
+            </div>
         </div>
     </header>
 
@@ -138,7 +141,6 @@
     </main>
 
     <script>
-        // KONFIGURASI LIVE URL GOOGLE SHEETS
         const CONFIG = {
             analisis: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=0&single=true&output=csv",
             lead: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1435925801&single=true&output=csv",
@@ -156,10 +158,8 @@
         let activeTabKey = 'analisis';
         let barChart, pieChart;
 
-        // Clean currency string to Number
         function cleanVal(str) {
             if (!str) return 0;
-            // Remove RM, commas, and handle negative signs
             let val = str.replace(/[RM,\s]/gi, '');
             return parseFloat(val) || 0;
         }
@@ -168,7 +168,6 @@
             return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0);
         }
 
-        // CSV Parser (Handles quoted fields with commas)
         function parseCSV(csv) {
             const rows = [];
             let row = [];
@@ -191,14 +190,12 @@
             document.getElementById('loading').style.display = 'flex';
             
             try {
-                // Fetch each URL defined in CONFIG
                 for (let key in CONFIG) {
                     const response = await fetch(CONFIG[key]);
                     const text = await response.text();
                     const rows = parseCSV(text);
 
                     if (key === 'analisis') {
-                        // Extract Warrant Info (Specific to rows 1 and 2 of Analisis)
                         liveData.analisis.warrant = {
                             no: rows[0][2],
                             details: `${rows[1][2]} | Tarikh: ${rows[0][1]}`,
@@ -206,7 +203,6 @@
                             os29: cleanVal(rows[1][4]),
                             total: cleanVal(rows[1][5])
                         };
-                        // Extract Program Items (Rows 5 to 7 in your file)
                         const items = [];
                         for(let i=4; i<7; i++) {
                             if(rows[i] && rows[i][2]) {
@@ -221,7 +217,6 @@
                         }
                         liveData.analisis.items = items;
                     } else {
-                        // Extract Activity Items for individual sheets (Starts at row 4)
                         const items = [];
                         for(let i=3; i<rows.length; i++) {
                             if(rows[i] && rows[i][2] && cleanVal(rows[i][5]) > 0) {
@@ -237,9 +232,17 @@
                         liveData[key].items = items;
                     }
                 }
+                
+                // Set update timestamp
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+                const formattedTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                document.getElementById('update-timestamp').innerText = `Kemas Kini Terakhir: ${formattedDate}, ${formattedTime}`;
+                
                 updateUI();
             } catch (error) {
                 console.error("Fetch Error:", error);
+                document.getElementById('update-timestamp').innerText = "Gagal Mengemas Kini";
             } finally {
                 setTimeout(() => document.getElementById('loading').style.display = 'none', 800);
             }
@@ -249,7 +252,6 @@
             const current = liveData[activeTabKey];
             const items = current.items || [];
             
-            // Warrant Section
             const warrantSec = document.getElementById('warrant-section');
             if (activeTabKey === 'analisis' && liveData.analisis.warrant) {
                 const w = liveData.analisis.warrant;
@@ -262,7 +264,6 @@
                 warrantSec.classList.add('hidden');
             }
 
-            // Calculations
             const totalAlloc = items.reduce((a, b) => a + b.alloc, 0);
             const totalSpent = items.reduce((a, b) => a + b.spent, 0);
             const totalOS21 = items.reduce((a, b) => a + b.os21, 0);
@@ -270,7 +271,6 @@
             const balance = totalAlloc - totalSpent;
             const perc = totalAlloc > 0 ? (totalSpent/totalAlloc*100).toFixed(1) : 0;
 
-            // KPI Cards
             document.getElementById('kpi-container').innerHTML = `
                 <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Bajet Program</p>
@@ -290,7 +290,6 @@
                 </div>
             `;
 
-            // Table
             document.getElementById('table-title').innerText = current.title;
             document.getElementById('table-body').innerHTML = items.length ? items.map(i => `
                 <tr class="hover:bg-slate-50 transition-all group">
@@ -366,7 +365,6 @@
             updateUI();
         }
 
-        // Jalankan Fetch pertama kali apabila dashboard dibuka
         window.onload = fetchAllData;
     </script>
 </body>
