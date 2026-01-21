@@ -33,12 +33,38 @@
     <main class="max-w-7xl mx-auto px-6">
         
         <!-- Tab Navigation -->
-        <nav class="flex flex-wrap gap-2 mb-8 bg-slate-200/50 p-1.5 rounded-2xl w-fit">
+        <nav class="flex flex-wrap gap-2 mb-6 bg-slate-200/50 p-1.5 rounded-2xl w-fit">
             <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-white text-blue-600 shadow-sm">Analisis Keseluruhan</button>
             <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Pemerkasaan COE</button>
             <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Certified Assessor</button>
             <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Lead Auditor</button>
         </nav>
+
+        <!-- Warrant Information Section (Visible in Analysis Tab) -->
+        <div id="warrant-section" class="mb-8 hidden">
+            <div class="bg-blue-600 rounded-3xl p-8 text-white shadow-lg shadow-blue-200 relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <span class="bg-blue-500 text-blue-100 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border border-blue-400">Maklumat Waran Peruntukan</span>
+                        <h2 class="text-2xl font-bold mt-3" id="warrant-no">-</h2>
+                        <p class="text-blue-100 text-sm mt-1" id="warrant-details">No. Dokumen: - | Tarikh: -</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                            <p class="text-[10px] font-bold uppercase text-blue-100 opacity-80">Waran OS21</p>
+                            <p class="text-lg font-bold" id="warrant-os21">RM 0.00</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                            <p class="text-[10px] font-bold uppercase text-blue-100 opacity-80">Waran OS29</p>
+                            <p class="text-lg font-bold" id="warrant-os29">RM 0.00</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Abstract background shapes -->
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+            </div>
+        </div>
 
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="kpi-container">
@@ -90,32 +116,40 @@
     </main>
 
     <script>
-        // Data Mockup berdasarkan CSV anda
+        // Data berdasarkan fail CSV Analisis dan Helaian Program
         const data = {
             analisis: {
                 title: "Analisis Keseluruhan",
+                warrant: {
+                    no: "WARAN PERUNTUKAN LDP-BPG-050202",
+                    doc: "91000001",
+                    date: "12 Jan 2026",
+                    os21: 35391,
+                    os29: 15972,
+                    total: 51363
+                },
                 items: [
-                    { name: "Pemerkasaan COE", alloc: 42600, spent: 0, os21: 30000, os29: 12600 },
-                    { name: "Certified Assessor", alloc: 9400, spent: 9400, os21: 7000, os29: 2400 },
-                    { name: "Lead Auditor", alloc: 0, spent: 0, os21: 0, os29: 0 }
+                    { name: "LDP-BPG-PEMERKASAAN COE", alloc: 42600, spent: 0, os21: 30000, os29: 12600 },
+                    { name: "LDP-BPG-CERTIFIED ASSESSOR", alloc: 9400, spent: 9400, os21: 7000, os29: 2400 },
+                    { name: "LDP-BPG-LEAD AUDITOR", alloc: 0, spent: 0, os21: 0, os29: 0 }
                 ]
             },
             coe: {
                 title: "LDP-BPG-PEMERKASAAN COE",
                 items: [
-                    { name: "Bengkel Penyelarasan COE Bil. 1-5", alloc: 42600, spent: 0, os21: 30000, os29: 12600 }
+                    { name: "Bengkel Penyelarasan COE Bil. 1-5/2026", alloc: 42600, spent: 0, os21: 30000, os29: 12600 }
                 ]
             },
             assessor: {
                 title: "LDP-BPG-CERTIFIED ASSESSOR",
                 items: [
-                    { name: "Bengkel Penyelarasan Pensijilan", alloc: 9400, spent: 9400, os21: 7000, os29: 2400 }
+                    { name: "Bengkel Kerja Penyelarasan Pensijilan Certified Assessor", alloc: 9400, spent: 9400, os21: 7000, os29: 2400 }
                 ]
             },
             lead: {
                 title: "LDP-BPG-LEAD AUDITOR",
                 items: [
-                    { name: "Kursus Ketua Juruaudit ISO", alloc: 0, spent: 0, os21: 0, os29: 0 }
+                    { name: "Kursus Ketua Juruaudit ISO 9001:2015", alloc: 0, spent: 0, os21: 0, os29: 0 }
                 ]
             }
         };
@@ -130,7 +164,19 @@
             const current = data[tabKey];
             const items = current.items;
             
-            // Calculate Totals
+            // Show/Hide Warrant Section
+            const warrantSec = document.getElementById('warrant-section');
+            if (current.warrant) {
+                warrantSec.classList.remove('hidden');
+                document.getElementById('warrant-no').innerText = current.warrant.no;
+                document.getElementById('warrant-details').innerText = `No. Dokumen: ${current.warrant.doc} | Tarikh: ${current.warrant.date}`;
+                document.getElementById('warrant-os21').innerText = formatRM(current.warrant.os21);
+                document.getElementById('warrant-os29').innerText = formatRM(current.warrant.os29);
+            } else {
+                warrantSec.classList.add('hidden');
+            }
+
+            // Calculate Totals for KPIs
             const totalAlloc = items.reduce((a, b) => a + b.alloc, 0);
             const totalSpent = items.reduce((a, b) => a + b.spent, 0);
             const totalOS21 = items.reduce((a, b) => a + b.os21, 0);
@@ -142,19 +188,19 @@
             const kpiContainer = document.getElementById('kpi-container');
             kpiContainer.innerHTML = `
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Peruntukan</p>
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Peruntukan Program</p>
                     <h3 class="text-2xl font-bold text-blue-600">${formatRM(totalAlloc)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Perbelanjaan</p>
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Perbelanjaan Semasa</p>
                     <h3 class="text-2xl font-bold text-rose-500">${formatRM(totalSpent)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Baki</p>
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Baki Tersedia</p>
                     <h3 class="text-2xl font-bold text-emerald-600">${formatRM(balance)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Prestasi</p>
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Kadar Penggunaan</p>
                     <h3 class="text-2xl font-bold text-slate-800">${percentage}%</h3>
                 </div>
             `;
@@ -169,7 +215,7 @@
                     <td class="px-8 py-5 text-right font-medium text-rose-500">${formatRM(item.spent)}</td>
                     <td class="px-8 py-5 text-right font-bold text-emerald-600">${formatRM(item.alloc - item.spent)}</td>
                     <td class="px-8 py-5 text-center">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${item.spent > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${item.spent > 0 ? (item.alloc - item.spent === 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700') : 'bg-slate-100 text-slate-500'}">
                             ${item.spent > 0 ? (item.alloc - item.spent === 0 ? 'Selesai' : 'Aktif') : 'Belum Mula'}
                         </span>
                     </td>
@@ -233,11 +279,11 @@
             const legendDiv = document.getElementById('pie-legend');
             legendDiv.innerHTML = `
                 <div class="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500"></div><b>OS21</b></div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500"></div><b>OS21 (Perjalanan)</b></div>
                     <span>${formatRM(os21)}</span>
                 </div>
                 <div class="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-purple-500"></div><b>OS29</b></div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-purple-500"></div><b>OS29 (Iktisas)</b></div>
                     <span>${formatRM(os29)}</span>
                 </div>
             `;
