@@ -114,9 +114,20 @@
         <!-- Data Table -->
         <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
             <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
-                    <p class="text-sm text-slate-400 mt-1">Butiran pelaksanaan dan lokasi aktiviti LDP</p>
+                <div class="flex flex-col md:flex-row md:items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
+                        <p class="text-sm text-slate-400 mt-1">Butiran pelaksanaan dan lokasi aktiviti LDP</p>
+                    </div>
+                    <!-- OPR Link Button -->
+                    <div id="opr-container" class="hidden">
+                        <a id="opr-link" href="#" target="_blank" class="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-200 transition-all border border-emerald-200 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Buka Laporan OPR (Google Drive)
+                        </a>
+                    </div>
                 </div>
                 <div class="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-500 uppercase tracking-widest border border-slate-100">
                     Mata Wang: RM
@@ -150,6 +161,12 @@
             lead: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1435925801&single=true&output=csv",
             coe: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1031215483&single=true&output=csv",
             assessor: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=2077989648&single=true&output=csv"
+        };
+
+        const OPR_LINKS = {
+            coe: "https://drive.google.com/drive/folders/11UGYSgaxB2gE5_IN3KEFxW7u6UMq5K2T?usp=sharing",
+            lead: "https://drive.google.com/drive/folders/1BpSD09u0Yk0M6V1kide94BV2h1DpmniI?usp=sharing",
+            assessor: "https://drive.google.com/drive/folders/1OrkvKi8FRF7lMiYY9gbgGTjAo3J1LhDu?usp=sharing"
         };
 
         let liveData = {
@@ -266,6 +283,7 @@
             const current = liveData[activeTabKey];
             const items = current.items || [];
             
+            // Warrant Section
             const warrantSec = document.getElementById('warrant-section');
             if (activeTabKey === 'analisis' && liveData.analisis.warrant) {
                 const w = liveData.analisis.warrant;
@@ -276,6 +294,16 @@
                 document.getElementById('warrant-os29').innerText = formatRM(w.os29);
             } else {
                 warrantSec.classList.add('hidden');
+            }
+
+            // OPR Link Visibility
+            const oprContainer = document.getElementById('opr-container');
+            const oprLink = document.getElementById('opr-link');
+            if (OPR_LINKS[activeTabKey]) {
+                oprContainer.classList.remove('hidden');
+                oprLink.href = OPR_LINKS[activeTabKey];
+            } else {
+                oprContainer.classList.add('hidden');
             }
 
             const totalAlloc = items.reduce((a, b) => a + b.alloc, 0);
