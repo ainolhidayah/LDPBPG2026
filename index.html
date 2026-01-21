@@ -3,36 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Analisis Kewangan LDP 2026</title>
+    <title>Dashboard Analisis Kewangan LDP 2026 (Debug Mode)</title>
     
-    <!-- Panggilan Library Luaran -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Library Luaran (Versi Stabil) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .card-glow:hover { box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04); }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Log Console pada skrin untuk debugging */
+        #debug-console {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 150px;
+            background: #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px;
+            overflow-y: auto; padding: 10px; z-index: 9999; border-top: 2px solid #3b82f6;
+            display: block; /* Tukar ke 'none' jika sudah ok */
+        }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid #334155; padding-bottom: 2px; }
+        .log-error { color: #f87171; font-weight: bold; }
+        .log-success { color: #4ade80; }
     </style>
 </head>
 <body>
 
-    <div id="fallback-ui" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
-        <div class="w-12 h-12 border-4 border-slate-100 border-t-blue-600 rounded-full spin mb-4"></div>
-        <h2 class="text-slate-800 font-bold tracking-tight">Menjana Dashboard...</h2>
-        <p class="text-slate-400 text-xs mt-2 italic">Menyemak sambungan data...</p>
+    <div id="root"></div>
+    
+    <!-- Kotak Log untuk melihat error -->
+    <div id="debug-console">
+        <div class="log-line">--- SISTEM DIAGNOSTIK DIMULAKAN ---</div>
     </div>
 
-    <div id="root"></div>
-
     <script type="text/babel">
+        // Fungsi Logger Custom
+        function log(msg, type = 'info') {
+            const consoleDiv = document.getElementById('debug-console');
+            const line = document.createElement('div');
+            line.className = `log-line ${type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : ''}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            if (type === 'error') console.error(msg);
+            else console.log(msg);
+        }
+
+        log("Memuatkan React & Recharts...");
+
         const { useState, useEffect } = React;
         const { 
             BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -51,20 +71,16 @@
             }
         };
 
-        // DATA CONTOH (BACKUP) - Akan muncul jika sambungan LIVE gagal
-        const MOCK_DATA = [
-            { kod: 'SK145', program: 'LDP-BPG-LEAD AUDITOR', p21: 0, p29: 0, b21: 0, b29: 0, peruntukan: 0, belanja: 0, baki: 0, peratus: 0 },
-            { kod: 'SK146', program: 'LDP-BPG-PEMERKASAAN COE', p21: 30000, p29: 12600, b21: 0, b29: 0, peruntukan: 42600, belanja: 0, baki: 42600, peratus: 0 },
-            { kod: 'SK147', program: 'LDP-BPG-CERTIFIED ASSESSOR', p21: 7000, p29: 2400, b21: 7000, b29: 2400, peruntukan: 9400, belanja: 9400, baki: 0, peratus: 100 }
-        ];
-
         const formatCurrency = (val) => new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(val);
 
         const cleanNum = (str) => {
             if (!str || typeof str !== 'string') return 0;
+            // Handle #DIV/0! error dari Excel
+            if (str.includes('#DIV/0') || str.includes('#VALUE')) return 0;
             let cleaned = str.replace(/[RM,\s%"$]/g, "").trim();
-            if (cleaned === "#DIV/0!" || cleaned === "" || isNaN(cleaned)) return 0;
-            return parseFloat(cleaned);
+            if (cleaned === "") return 0;
+            let num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
         };
 
         const robustSplit = (line) => {
@@ -82,42 +98,58 @@
         };
 
         function App() {
+            log("Komponen App dimulakan...");
             const [data, setData] = useState([]);
             const [loading, setLoading] = useState(true);
-            const [isLive, setIsLive] = useState(false);
+            const [error, setError] = useState(null);
             const [lastUpdated, setLastUpdated] = useState("");
 
             useEffect(() => {
-                const fb = document.getElementById('fallback-ui');
-                if (fb) fb.style.display = 'none';
                 fetchSummary();
             }, []);
 
             const fetchSummary = async () => {
                 setLoading(true);
+                setError(null);
+                log("Mula memuat turun data ANALISIS...", 'info');
+                
                 try {
-                    // Cuba ambil data Live dulu
                     const response = await fetch(SHEET_LINKS.ANALISIS);
-                    if (!response.ok) throw new Error("Gagal");
+                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                     
                     const text = await response.text();
-                    if (text.startsWith("<!DOCTYPE html>")) throw new Error("HTML response");
+                    
+                    // Semak jika Google hantar HTML (Login page) bukannya CSV
+                    if (text.trim().startsWith("<!DOCTYPE html>") || text.includes("<html")) {
+                        throw new Error("Pautan CSV memulangkan HTML. Mungkin fail tidak 'Publish to Web' atau link salah.");
+                    }
+
+                    log("Data berjaya dimuat turun (" + text.length + " bytes). Mula memproses...", 'success');
 
                     const lines = text.split(/\r?\n/).filter(l => l.trim());
                     const parsed = [];
                     
-                    lines.forEach((line) => {
+                    lines.forEach((line, idx) => {
                         const row = robustSplit(line);
-                        // Data dalam ANALISIS.csv bermula dengan SK di index 1
-                        if (row.length > 8 && row[1] && row[1].startsWith('SK')) {
+                        // Debug baris pertama untuk pastikan format
+                        if (idx < 5) log(`Baris ${idx}: ${row.join(' | ')}`);
+
+                        // Logik: Data dalam ANALISIS.csv biasanya bermula dengan 'SK' di kolum 2
+                        if (row.length > 5 && row[1] && row[1].startsWith('SK')) {
                             const p21 = cleanNum(row[3]);
                             const p29 = cleanNum(row[4]);
                             const b21 = cleanNum(row[6]);
                             const b29 = cleanNum(row[7]);
                             const totalP = p21 + p29;
                             const totalB = b21 + b29;
-                            // Kira peratus manual jika data excel #DIV/0!
-                            const peratus = totalP > 0 ? (totalB / totalP) * 100 : 0;
+                            
+                            // Ambil peratus dari lajur jika ada, atau kira sendiri
+                            let peratus = 0;
+                            if (row[12]) {
+                                peratus = cleanNum(row[12]);
+                            } else {
+                                peratus = totalP > 0 ? (totalB / totalP) * 100 : 0;
+                            }
 
                             parsed.push({
                                 kod: row[1],
@@ -131,17 +163,17 @@
                         }
                     });
 
-                    if (parsed.length === 0) throw new Error("Tiada data SK ditemui");
+                    log(`Proses tamat. ${parsed.length} program dijumpai.`, 'success');
+
+                    if (parsed.length === 0) {
+                        throw new Error("Tiada baris data yang bermula dengan 'SK' dijumpai. Sila semak format CSV.");
+                    }
                     
                     setData(parsed);
-                    setIsLive(true);
                     setLastUpdated(new Date().toLocaleTimeString());
                 } catch (err) {
-                    // Jika gagal (CORS atau link salah), guna MOCK_DATA
-                    console.warn("Gagal sambung Live Data, menggunakan data contoh.", err);
-                    setData(MOCK_DATA);
-                    setIsLive(false); // Mode Backup
-                    setLastUpdated("Mode Pratonton (Offline)");
+                    log(`RALAT UTAMA: ${err.message}`, 'error');
+                    setError(err.message);
                 }
                 setLoading(false);
             };
@@ -160,90 +192,74 @@
                 { name: 'OS29000', value: sumP29, color: '#9333ea' }
             ];
 
+            if (loading) return (
+                <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
+                    <div className="w-16 h-16 border-4 border-slate-200 border-t-blue-600 rounded-full spin mb-4"></div>
+                    <h2 className="text-slate-800 font-bold">Sedang Memproses Data...</h2>
+                    <p className="text-xs text-slate-500 mt-2">Sila lihat log di bawah</p>
+                </div>
+            );
+
+            if (error) return (
+                <div className="flex flex-col items-center justify-center h-screen p-8 bg-red-50 text-center">
+                    <h1 className="text-3xl font-black text-red-600 mb-4">RALAT SISTEM</h1>
+                    <p className="text-red-800 font-bold mb-4">{error}</p>
+                    <button onClick={fetchSummary} className="bg-red-600 text-white px-6 py-2 rounded-lg font-bold">Cuba Semula</button>
+                    <p className="text-xs text-red-500 mt-8">Sila semak kotak hitam di bawah untuk perincian ralat.</p>
+                </div>
+            );
+
             return (
-                <div className="min-h-screen pb-20 fade-in">
+                <div className="min-h-screen pb-40">
                     {/* Top Bar */}
                     <div className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-40 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
                         <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-xl text-white shadow-lg ${isLive ? 'bg-emerald-500 shadow-emerald-200' : 'bg-orange-500 shadow-orange-200'}`}>
+                            <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
                             </div>
                             <div>
                                 <h1 className="text-lg font-black text-slate-900 leading-none uppercase tracking-tighter">Analisis Kewangan LDP 2026</h1>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-                                    Status: <span className={`${isLive ? 'text-emerald-600' : 'text-orange-500'} italic font-bold`}>
-                                        {isLive ? 'LIVE (Google Sheets)' : 'Mod Pratonton (Data Contoh)'}
-                                    </span>
-                                </p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: <span className="text-emerald-500 italic">Connected</span></p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <div className="text-right hidden md:block">
-                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Kemas kini terakhir</p>
-                                <p className="text-xs font-black text-slate-700">{lastUpdated}</p>
-                            </div>
-                            <button onClick={fetchSummary} className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-md active:scale-95">
-                                {loading ? 'Memuatkan...' : 'Segarkan'}
-                            </button>
+                            <button onClick={fetchSummary} className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-md active:scale-95">Segarkan</button>
                         </div>
                     </div>
-
-                    {!isLive && (
-                        <div className="bg-orange-50 border-b border-orange-100 p-2 text-center text-[10px] font-bold text-orange-600 uppercase tracking-widest">
-                            Nota: Paparan ini menggunakan data contoh kerana sambungan Live disekat di dalam preview ini. Di GitHub nanti ia akan jadi Live.
-                        </div>
-                    )}
 
                     <div className="max-w-7xl mx-auto p-6 lg:p-10 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 card-glow transition-all">
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Peruntukan OS21000</p>
                                 <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{formatCurrency(sumP21)}</h2>
-                                <div className="mt-4 flex items-center justify-between text-[10px] font-bold text-slate-400">
-                                    <span>PENGGUNAAN</span>
-                                    <span className="text-blue-600">{sumP21 > 0 ? (sumB21/sumP21*100).toFixed(1) : 0}%</span>
-                                </div>
                                 <div className="mt-2 h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
                                     <div className="h-full bg-blue-500 transition-all duration-1000" style={{width: `${sumP21 > 0 ? (sumB21/sumP21*100) : 0}%`}}></div>
                                 </div>
                             </div>
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 card-glow transition-all">
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Peruntukan OS29000</p>
                                 <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{formatCurrency(sumP29)}</h2>
-                                <div className="mt-4 flex items-center justify-between text-[10px] font-bold text-slate-400">
-                                    <span>PENGGUNAAN</span>
-                                    <span className="text-purple-600">{sumP29 > 0 ? (sumB29/sumP29*100).toFixed(1) : 0}%</span>
-                                </div>
                                 <div className="mt-2 h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
                                     <div className="h-full bg-purple-500 transition-all duration-1000" style={{width: `${sumP29 > 0 ? (sumB29/sumP29*100) : 0}%`}}></div>
                                 </div>
                             </div>
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 card-glow transition-all bg-gradient-to-br from-white to-orange-50/30">
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm bg-gradient-to-br from-white to-orange-50/30">
                                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Belanja Keseluruhan</p>
                                 <h2 className="text-2xl font-black text-orange-600 tracking-tighter">{formatCurrency(grandTotalB)}</h2>
-                                <p className="text-[10px] text-orange-400 font-bold mt-2 uppercase tracking-tighter italic">Prestasi: {globalPeratus > 80 ? 'TINGGI' : 'OPTIMAL'}</p>
                             </div>
                             <div className="bg-slate-900 p-6 rounded-[2rem] text-white shadow-2xl shadow-slate-200">
                                 <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mb-1">Baki Semasa</p>
                                 <h2 className="text-2xl font-black tracking-tighter">{formatCurrency(grandTotalP - grandTotalB)}</h2>
-                                <div className="mt-4 flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-blue-400">PENGGUNAAN DANA</span>
-                                    <span className="text-lg font-black">{globalPeratus.toFixed(1)}%</span>
-                                </div>
                             </div>
                         </div>
 
                         {/* Main Charts */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Bar Chart Section */}
                             <div className="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
                                 <div className="flex justify-between items-center mb-10">
-                                    <div>
-                                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Prestasi Mengikut Modul</h3>
-                                        <p className="text-[10px] text-slate-400 font-bold">Analisis OS21000 vs OS29000 (RM)</p>
-                                    </div>
+                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Prestasi Mengikut Modul</h3>
                                     <div className="flex gap-4">
                                         <div className="flex items-center gap-2"><div className="w-2 h-2 bg-blue-500 rounded-full"></div><span className="text-[9px] font-bold text-slate-500">OS21</span></div>
                                         <div className="flex items-center gap-2"><div className="w-2 h-2 bg-purple-500 rounded-full"></div><span className="text-[9px] font-bold text-slate-500">OS29</span></div>
@@ -268,7 +284,6 @@
                                 </div>
                             </div>
 
-                            {/* Pie Chart Section */}
                             <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
                                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Pecahan Peruntukan</h3>
                                 <div className="flex-grow min-h-[300px]">
@@ -299,20 +314,17 @@
                         <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
                             <div className="p-8 border-b bg-slate-50/50 flex justify-between items-center">
                                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Analisis Terperinci OS21 & OS29</h3>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase">JUMLAH REKOD:</span>
-                                    <span className="bg-blue-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold">{data.length}</span>
-                                </div>
+                                <span className="bg-blue-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold">{data.length}</span>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-xs border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50/80 text-slate-400 font-black uppercase tracking-widest text-[9px] border-b">
                                             <th className="p-6">Kod & Program</th>
-                                            <th className="p-6 text-center border-l bg-blue-50/20">OS21000 (P)</th>
-                                            <th className="p-6 text-center bg-blue-50/20">OS21000 (B)</th>
-                                            <th className="p-6 text-center border-l bg-purple-50/20">OS29000 (P)</th>
-                                            <th className="p-6 text-center bg-purple-50/20">OS29000 (B)</th>
+                                            <th className="p-6 text-center border-l bg-blue-50/20">OS21 (P)</th>
+                                            <th className="p-6 text-center bg-blue-50/20">OS21 (B)</th>
+                                            <th className="p-6 text-center border-l bg-purple-50/20">OS29 (P)</th>
+                                            <th className="p-6 text-center bg-purple-50/20">OS29 (B)</th>
                                             <th className="p-6 text-right border-l">Baki (RM)</th>
                                             <th className="p-6 text-right">% Belanja</th>
                                         </tr>
@@ -342,25 +354,10 @@
                                             </tr>
                                         ))}
                                     </tbody>
-                                    <tfoot className="bg-slate-900 text-white">
-                                        <tr className="font-black uppercase tracking-tighter text-sm">
-                                            <td className="p-8">Jumlah Keseluruhan</td>
-                                            <td className="p-8 text-center">{formatCurrency(sumP21)}</td>
-                                            <td className="p-8 text-center text-blue-400">{formatCurrency(sumB21)}</td>
-                                            <td className="p-8 text-center">{formatCurrency(sumP29)}</td>
-                                            <td className="p-8 text-center text-purple-400">{formatCurrency(sumB29)}</td>
-                                            <td className="p-8 text-right text-emerald-400">{formatCurrency(grandTotalP - grandTotalB)}</td>
-                                            <td className="p-8 text-right text-2xl">{globalPeratus.toFixed(1)}%</td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                         </div>
                     </div>
-
-                    <footer className="mt-20 py-10 text-center border-t border-slate-200">
-                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em] italic italic">IAB KPM FINANCIAL ANALYTICS v5.0 • REAL-TIME DATA</p>
-                    </footer>
                 </div>
             );
         }
