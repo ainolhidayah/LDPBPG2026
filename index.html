@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kewangan LDP BPG 2026</title>
+    
+    <!-- Load React, Babel & Tailwind via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Recharts -->
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+            ResponsiveContainer, Cell, PieChart, Pie 
+        } = Recharts;
+
+        // =================================================================================
+        // 🔧 KONFIGURASI LINK GOOGLE SHEET (LIVE CSV)
+        // =================================================================================
+        const SPREADSHEET_ID = '1S2RpNSg8VUw2zd-IzaS8Krqo8sYbOdFQQOrLQVSS10o';
+
+        const SHEET_LINKS = {
+            // Ini adalah link yang telah diformat untuk output CSV
+            ANALISIS: `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?gid=0&single=true&output=csv`, 
+            
+            PROGRAMS: {
+                // Sila pastikan GID (nombor selepas gid=) sepadan dengan tab di Google Sheet anda
+                'LDP-BPG-LEAD AUDITOR': `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?gid=1840632363&single=true&output=csv`,
+                'LDP-BPG-PEMERKASAAN COE': `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?gid=648618991&single=true&output=csv`,
+                'LDP-BPG-CERTIFIED ASSESSOR': `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?gid=150645068&single=true&output=csv`
+            }
+        };
+
+        const formatCurrency = (val) => new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(val);
+
+        const parseCSV = (csvText, type) => {
+            if (!csvText) return [];
+            const lines = csvText.split('\n').map(l => l.trim()).filter(l => l);
+            const data = [];
+            
+            if (type === 'analysis') {
+                for (let i = 2; i < lines.length; i++) {
+                    const row = lines[i].split(',');
+                    if (row.length > 2 && row[1]) {
+                        // Bersihkan simbol RM dan koma sebelum tukar ke nombor
+                        const cleanNum = (str) => parseFloat(str?.replace(/[RM,\s]/g, "")) || 0;
+                        
+                        const p21 = cleanNum(row[3]);
+                        const p29 = cleanNum(row[4]);
+                        const b21 = cleanNum(row[5]);
+                        const b29 = cleanNum(row[6]);
+                        
+                        data.push({
+                            kod: row[1], 
+                            program: row[2].replace(/"/g, ''),
+                            total_peruntukan: p21 + p29,
+                            total_perbelanjaan: b21 + b29,
+                            peruntukan_os21: p21, 
+                            peruntukan_os29: p29
+                        });
+                    }
+                }
+            }
+            return data;
+        };
+
+        function App() {
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            useEffect(() => {
+                fetchData();
+            }, []);
+
+            const fetchData = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    // Gunakan proxy atau fetch terus jika CORS dibenarkan oleh Google (Publish to Web biasanya benarkan)
+                    const response = await fetch(SHEET_LINKS.ANALISIS);
+                    if (!response.ok) throw new Error("Gagal mengambil data. Pastikan anda telah klik 'File > Share > Publish to Web' di Google Sheets.");
+                    
+                    const text = await response.text();
+                    const parsedData = parseCSV(text, 'analysis');
+                    setData(parsedData);
+                } catch (e) { 
+                    console.error("Fetch error:", e);
+                    setError(e.message);
+                }
+                setLoading(false);
+            };
+
+            const totalP = data.reduce((a, c) => a + c.total_peruntukan, 0);
+            const totalB = data.reduce((a, c) => a + c.total_perbelanjaan, 0);
+
+            if (loading) return (
+                <div className="flex flex-col h-screen items-center justify-center text-slate-500">
+                    <div className="animate-spin mb-4 text-3xl">🔄</div>
+                    <p>Menghubungkan ke Google Sheets...</p>
+                </div>
+            );
+
+            return (
+                <div className="p-4 md:p-8 max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-800">Dashboard Kewangan LDP 2026</h1>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <p className="text-slate-500 text-sm italic">Data disambung terus ke Google Sheets</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={fetchData} 
+                            className="bg-slate-800 text-white px-5 py-2.5 rounded-lg hover:bg-slate-700 transition flex items-center gap-2 text-sm font-medium shadow-sm"
+                        >
+                            🔄 Kemaskini Data
+                        </button>
+                    </div>
+
+                    {error && (
+                        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-5 rounded-xl mb-8 flex flex-col gap-2">
+                            <p className="font-bold">⚠️ Data Tidak Dapat Dipaparkan</p>
+                            <p className="text-sm">Anda perlu mengaktifkan fungsi <strong>Publish to Web</strong> di Google Sheets:</p>
+                            <ol className="list-decimal ml-5 text-sm">
+                                <li>Buka Google Sheet anda.</li>
+                                <li>Klik <strong>File</strong> > <strong>Share</strong> > <strong>Publish to web</strong>.</li>
+                                <li>Pilih tab <strong>ANALISIS</strong> dan tukar format ke <strong>CSV</strong>.</li>
+                                <li>Klik <strong>Publish</strong>.</li>
+                            </ol>
+                        </div>
+                    )}
+
+                    {/* Kad Ringkasan */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-blue-500">
+                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Jumlah Peruntukan</p>
+                            <h2 className="text-2xl font-black text-slate-800">{formatCurrency(totalP)}</h2>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-orange-500">
+                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Jumlah Perbelanjaan</p>
+                            <h2 className="text-2xl font-black text-slate-800">{formatCurrency(totalB)}</h2>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
+                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Baki Semasa</p>
+                            <h2 className="text-2xl font-black text-slate-800">{formatCurrency(totalP - totalB)}</h2>
+                        </div>
+                    </div>
+
+                    {/* Carta */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 className="font-bold mb-6 text-slate-700 flex items-center gap-2">
+                                📊 Prestasi Mengikut Kod
+                            </h3>
+                            <div className="h-72 w-full">
+                                <ResponsiveContainer>
+                                    <BarChart data={data}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                        <XAxis dataKey="kod" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                                        <YAxis hide />
+                                        <Tooltip 
+                                            cursor={{fill: '#f8fafc'}}
+                                            contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
+                                            formatter={(val) => formatCurrency(val)} 
+                                        />
+                                        <Bar dataKey="total_peruntukan" name="Peruntukan" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={30} />
+                                        <Bar dataKey="total_perbelanjaan" name="Perbelanjaan" fill="#f97316" radius={[4, 4, 0, 0]} barSize={30} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 className="font-bold mb-6 text-slate-700">🍰 Pecahan Peruntukan</h3>
+                            <div className="h-72 w-full">
+                                <ResponsiveContainer>
+                                    <PieChart>
+                                        <Pie
+                                            data={data}
+                                            dataKey="total_peruntukan"
+                                            nameKey="kod"
+                                            cx="50%" cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                        >
+                                            {data.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444'][index % 4]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(val) => formatCurrency(val)} />
+                                        <Legend verticalAlign="bottom" height={36}/>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Jadual */}
+                    <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
+                        <div className="p-5 border-b border-slate-50 bg-slate-50/50">
+                            <h3 className="font-bold text-slate-700">Senarai Program Induk</h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead>
+                                    <tr className="text-slate-400 font-bold border-b border-slate-50 uppercase text-[10px] tracking-widest">
+                                        <th className="p-5">Kod</th>
+                                        <th className="p-5">Program</th>
+                                        <th className="p-5 text-right">Peruntukan</th>
+                                        <th className="p-4 text-right">Perbelanjaan</th>
+                                        <th className="p-5 text-right">Baki</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data.map((item, i) => (
+                                        <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                            <td className="p-5 font-bold text-slate-800">{item.kod}</td>
+                                            <td className="p-5 text-slate-600 font-medium">{item.program}</td>
+                                            <td className="p-5 text-right text-blue-600 font-semibold">{formatCurrency(item.total_peruntukan)}</td>
+                                            <td className="p-5 text-right text-orange-500">{formatCurrency(item.total_perbelanjaan)}</td>
+                                            <td className="p-5 text-right font-black text-slate-700">{formatCurrency(item.total_peruntukan - item.total_perbelanjaan)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
