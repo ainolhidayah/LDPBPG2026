@@ -14,11 +14,6 @@
     <meta property="og:title" content="Dashboard Perbelanjaan Peruntukan LDP-BPG 050202">
     <meta property="og:description" content="Laporan Pemantauan Kewangan Program LDP 2026 secara masa nyata.">
     
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Dashboard Perbelanjaan Peruntukan LDP-BPG 050202">
-    <meta property="twitter:description" content="Laporan Pemantauan Kewangan Program LDP 2026 secara masa nyata.">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -75,7 +70,7 @@
             <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">Lead Auditor</button>
         </nav>
 
-        <!-- Warrant Section -->
+        <!-- Warrant Details Section -->
         <div id="warrant-section" class="mb-10 hidden">
             <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
                 <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
@@ -85,12 +80,12 @@
                         <p class="text-blue-100 text-sm mt-2 opacity-80" id="warrant-details">Sila klik "Kemaskini" untuk memaparkan maklumat waran.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-4 w-full lg:w-auto">
-                        <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10">
-                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">OS21</p>
+                        <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center">
+                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Peruntukan OS21</p>
                             <p class="text-2xl font-black" id="warrant-os21">RM 0.00</p>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10">
-                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">OS29</p>
+                        <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center">
+                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Peruntukan OS29</p>
                             <p class="text-2xl font-black" id="warrant-os29">RM 0.00</p>
                         </div>
                     </div>
@@ -99,7 +94,23 @@
         </div>
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-10" id="kpi-container"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="kpi-container"></div>
+
+        <!-- Remaining Warrant Summary (Only for Analysis) -->
+        <div id="remaining-warrant-summary" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
+            <div class="bg-blue-900 text-white p-6 rounded-[2rem] shadow-lg flex flex-col items-center">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Baki Waran OS21</p>
+                <h4 class="text-xl font-black" id="rem-os21">RM 0.00</h4>
+            </div>
+            <div class="bg-indigo-900 text-white p-6 rounded-[2rem] shadow-lg flex flex-col items-center">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-300 mb-2">Baki Waran OS29</p>
+                <h4 class="text-xl font-black" id="rem-os29">RM 0.00</h4>
+            </div>
+            <div class="bg-slate-900 text-white p-6 rounded-[2rem] shadow-lg flex flex-col items-center border-2 border-blue-500">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-2">Jumlah Baki Waran</p>
+                <h4 class="text-xl font-black text-blue-400" id="rem-total">RM 0.00</h4>
+            </div>
+        </div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
@@ -131,9 +142,8 @@
                 <div class="flex flex-col md:flex-row md:items-center gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
-                        <p class="text-sm text-slate-400 mt-1">Butiran pelaksanaan dan lokasi aktiviti LDP</p>
+                        <p class="text-sm text-slate-400 mt-1">Status pelaksanaan dan Pegawai Meja bertanggungjawab</p>
                     </div>
-                    <!-- OPR Link Button -->
                     <div id="opr-container" class="hidden">
                         <a id="opr-link" href="#" target="_blank" class="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-200 transition-all border border-emerald-200 shadow-sm text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,13 +239,13 @@
                     const rows = parseCSV(text);
 
                     if (key === 'analisis') {
-                        if (rows[0]) {
+                        if (rows[1]) {
                             liveData.analisis.warrant = {
                                 no: rows[0][2] || "-",
                                 details: `${rows[1] ? rows[1][2] : "-"} | Tarikh: ${rows[0][1] || "-"}`,
-                                os21: cleanVal(rows[1] ? rows[1][3] : "0"),
-                                os29: cleanVal(rows[1] ? rows[1][4] : "0"),
-                                total: cleanVal(rows[1] ? rows[1][5] : "0")
+                                os21: cleanVal(rows[1][3]),
+                                os29: cleanVal(rows[1][4]),
+                                total: cleanVal(rows[1][5])
                             };
                         }
                         const items = [];
@@ -247,7 +257,7 @@
                                     spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]),
                                     os29: cleanVal(rows[i][4]),
-                                    warrantBalance: cleanVal(rows[i][13]), // Added new column mapping (Index 13)
+                                    officer: rows[i][14] || "-", // Officer column in analysis sheet
                                     startDate: "-", endDate: "-", participants: "-", location: "-"
                                 });
                             }
@@ -266,7 +276,8 @@
                                     startDate: rows[i][12] || "-",
                                     endDate: rows[i][13] || "-",
                                     participants: rows[i][14] || "-",
-                                    location: rows[i][15] || "-"
+                                    location: rows[i][15] || "-",
+                                    officer: rows[i][16] || "-" // Officer column in program sheets
                                 });
                             }
                         }
@@ -294,12 +305,13 @@
             const mainTable = document.getElementById('main-table');
             if (isAnalisis) {
                 mainTable.classList.remove('min-w-[1100px]');
-                mainTable.classList.add('min-w-[900px]');
+                mainTable.classList.add('min-w-[1000px]');
             } else {
                 mainTable.classList.add('min-w-[1100px]');
-                mainTable.classList.remove('min-w-[900px]');
+                mainTable.classList.remove('min-w-[1000px]');
             }
 
+            // Top Warrant Box
             const warrantSec = document.getElementById('warrant-section');
             if (isAnalisis && liveData.analisis.warrant) {
                 const w = liveData.analisis.warrant;
@@ -310,6 +322,24 @@
                 document.getElementById('warrant-os29').innerText = formatRM(w.os29);
             } else {
                 warrantSec.classList.add('hidden');
+            }
+
+            // Remaining Warrant Summary Section (Calculated)
+            const remSummary = document.getElementById('remaining-warrant-summary');
+            if(isAnalisis && liveData.analisis.warrant) {
+                remSummary.classList.remove('hidden');
+                const w = liveData.analisis.warrant;
+                const totalAllocOS21 = items.reduce((a, b) => a + b.os21, 0);
+                const totalAllocOS29 = items.reduce((a, b) => a + b.os29, 0);
+                
+                const bakiOS21 = w.os21 - totalAllocOS21;
+                const bakiOS29 = w.os29 - totalAllocOS29;
+                
+                document.getElementById('rem-os21').innerText = formatRM(bakiOS21);
+                document.getElementById('rem-os29').innerText = formatRM(bakiOS29);
+                document.getElementById('rem-total').innerText = formatRM(bakiOS21 + bakiOS29);
+            } else {
+                remSummary.classList.add('hidden');
             }
 
             const oprContainer = document.getElementById('opr-container');
@@ -329,12 +359,9 @@
             const perc = totalAlloc > 0 ? (totalSpent/totalAlloc*100).toFixed(1) : 0;
             const perfColor = getPerformanceColor(parseFloat(perc));
 
-            // Logic for Warrant Balance after all allocations
-            const lastWarrantBalance = items.length > 0 && isAnalisis ? items[items.length - 1].warrantBalance : 0;
-
             document.getElementById('kpi-container').innerHTML = `
                 <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Bajet Program</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Peruntukan Dipohon</p>
                     <h3 class="text-xl font-black text-blue-600">${formatRM(totalAlloc)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
@@ -349,40 +376,45 @@
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi Belanja</p>
                     <h3 class="text-xl font-black ${perfColor.text}">${perc}%</h3>
                 </div>
-                ${isAnalisis ? `
-                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 shadow-sm text-center">
-                    <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Baki Waran Tersedia</p>
-                    <h3 class="text-xl font-black text-blue-800">${formatRM(lastWarrantBalance)}</h3>
-                </div>
-                ` : ''}
             `;
 
+            // Update Table Header
             document.getElementById('table-header-row').innerHTML = `
                 <th class="px-8 py-5">Nama Aktiviti / Program</th>
-                ${!isAnalisis ? `<th class="px-4 py-5 text-center">Tarikh Mula</th><th class="px-4 py-5 text-center">Tarikh Akhir</th><th class="px-4 py-5 text-center">Bil. Peserta</th><th class="px-4 py-5 text-center">Lokasi</th>` : ''}
+                ${!isAnalisis ? `
+                    <th class="px-4 py-5 text-center">Tarikh Mula</th>
+                    <th class="px-4 py-5 text-center">Tarikh Akhir</th>
+                    <th class="px-4 py-5 text-center">Peserta</th>
+                    <th class="px-4 py-5 text-center">Lokasi</th>
+                ` : ''}
                 <th class="px-6 py-5 text-right">Peruntukan</th>
                 <th class="px-6 py-5 text-right text-slate-900">Belanja</th>
-                <th class="px-6 py-5 text-right text-emerald-600">Baki Peruntukan</th>
-                ${isAnalisis ? `<th class="px-6 py-5 text-right text-blue-700 bg-blue-50/50">Baki Waran</th>` : ''}
+                <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
+                <th class="px-6 py-5 text-left">Pegawai Meja</th>
             `;
 
             document.getElementById('table-title').innerText = current.title;
             document.getElementById('table-body').innerHTML = items.length ? items.map(i => {
-                const itemPerc = i.alloc > 0 ? (i.spent / i.alloc * 100).toFixed(1) : 0;
-                const itemColor = getPerformanceColor(parseFloat(itemPerc));
                 return `
                     <tr class="hover:bg-slate-50 transition-all group">
                         <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
                             ${i.name}
                         </td>
-                        ${!isAnalisis ? `<td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td><td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td><td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td><td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>` : ''}
+                        ${!isAnalisis ? `
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
+                            <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
+                        ` : ''}
                         <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
                         <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
                         <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
-                        ${isAnalisis ? `<td class="px-6 py-5 text-right font-black text-blue-700 bg-blue-50/30">${formatRM(i.warrantBalance)}</td>` : ''}
+                        <td class="px-6 py-5 text-left text-xs font-semibold text-slate-400 group-hover:text-slate-600 transition-colors">
+                            ${i.officer}
+                        </td>
                     </tr>
                 `;
-            }).join('') : `<tr><td colspan="${isAnalisis ? 5 : 8}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            }).join('') : `<tr><td colspan="${isAnalisis ? 5 : 9}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalOS21, totalOS29);
         }
