@@ -204,6 +204,13 @@
             return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0);
         }
 
+        // Helper untuk menentukan warna berdasarkan peratusan prestasi
+        function getPerformanceColor(perc) {
+            if (perc < 50) return { text: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' };
+            if (perc < 85) return { text: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' };
+            return { text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' };
+        }
+
         function parseCSV(csv) {
             const rows = [];
             let row = [];
@@ -327,6 +334,9 @@
             const totalOS29 = items.reduce((a, b) => a + b.os29, 0);
             const balance = totalAlloc - totalSpent;
             const perc = totalAlloc > 0 ? (totalSpent/totalAlloc*100).toFixed(1) : 0;
+            
+            // Get performance colors for the overall tab
+            const perfColor = getPerformanceColor(parseFloat(perc));
 
             document.getElementById('kpi-container').innerHTML = `
                 <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
@@ -341,25 +351,42 @@
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Baki Peruntukan</p>
                     <h3 class="text-2xl font-black text-emerald-600">${formatRM(balance)}</h3>
                 </div>
-                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                <div class="${perfColor.bg} p-8 rounded-3xl border ${perfColor.border} shadow-sm text-center transition-all duration-500">
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi Belanja</p>
-                    <h3 class="text-2xl font-black text-slate-800">${perc}%</h3>
+                    <h3 class="text-2xl font-black ${perfColor.text}">${perc}%</h3>
                 </div>
             `;
 
             document.getElementById('table-title').innerText = current.title;
-            document.getElementById('table-body').innerHTML = items.length ? items.map(i => `
-                <tr class="hover:bg-slate-50 transition-all group">
-                    <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">${i.name}</td>
-                    <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
-                    <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
-                    <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
-                    <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
-                    <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
-                    <td class="px-6 py-5 text-right font-bold text-rose-500">${formatRM(i.spent)}</td>
-                    <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
-                </tr>
-            `).join('') : `<tr><td colspan="8" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            document.getElementById('table-body').innerHTML = items.length ? items.map(i => {
+                const itemPerc = i.alloc > 0 ? (i.spent / i.alloc * 100).toFixed(1) : 0;
+                const itemColor = getPerformanceColor(parseFloat(itemPerc));
+                
+                return `
+                    <tr class="hover:bg-slate-50 transition-all group">
+                        <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
+                            ${i.name}
+                            <div class="mt-1 flex items-center gap-2 lg:hidden">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${itemColor.bg} ${itemColor.text} border ${itemColor.border}">
+                                    ${itemPerc}% Belanja
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
+                        <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
+                        <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
+                        <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
+                        <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
+                        <td class="px-6 py-5 text-right font-bold text-rose-500">
+                            ${formatRM(i.spent)}
+                            <div class="text-[9px] font-bold ${itemColor.text} hidden lg:block uppercase tracking-tighter">
+                                ${itemPerc}% Prestasi
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
+                    </tr>
+                `;
+            }).join('') : `<tr><td colspan="8" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalOS21, totalOS29);
         }
