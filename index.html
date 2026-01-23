@@ -73,24 +73,48 @@
             <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">Pemerkasaan COE</button>
             <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">Certified Assessor</button>
             <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">Lead Auditor</button>
+            <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">LDP-PBD</button>
         </nav>
+
+        <!-- Ceiling Section (Only for Analysis) -->
+        <div id="ceiling-section" class="mb-10 hidden">
+            <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border-b-8 border-blue-600">
+                <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+                    <div class="max-w-lg">
+                        <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-blue-400">Syiling Agihan Peruntukan 2026</span>
+                        <h2 class="text-3xl font-black mt-4 leading-tight uppercase" id="ceiling-title">LDP-050202 IAB 2026</h2>
+                        <p class="text-slate-400 text-sm mt-2 font-medium" id="ceiling-desc">Baki syiling dikira daripada baki peruntukan yang belum dipohon.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:w-auto">
+                        <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center min-w-[200px]">
+                            <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Jumlah Syiling</p>
+                            <p class="text-2xl font-black text-white" id="ceiling-total">RM 0.00</p>
+                        </div>
+                        <div id="ceiling-balance-card" class="bg-blue-600/20 backdrop-blur-xl p-6 rounded-3xl border border-blue-500/30 text-center min-w-[200px]">
+                            <p class="text-[10px] font-bold uppercase text-blue-300 tracking-wider mb-2">Baki Syiling</p>
+                            <p class="text-2xl font-black text-blue-400" id="ceiling-balance">RM 0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Warrant Details Section -->
         <div id="warrant-section" class="mb-10 hidden">
             <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
                 <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     <div class="max-w-lg">
-                        <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-white/30">Waran Peruntukan 2026</span>
+                        <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-white/30">Waran Peruntukan Diterima</span>
                         <h2 class="text-3xl font-black mt-4 leading-tight" id="warrant-no">-</h2>
-                        <p class="text-blue-100 text-sm mt-2 opacity-80" id="warrant-details">Sila klik "Kemaskini" untuk memaparkan maklumat waran.</p>
+                        <p class="text-blue-100 text-sm mt-2 opacity-80" id="warrant-details">Maklumat waran yang telah diluluskan bagi fasa semasa.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-4 w-full lg:w-auto">
                         <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center">
-                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Nilai Waran OS21</p>
+                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Waran OS21</p>
                             <p class="text-2xl font-black" id="warrant-os21">RM 0.00</p>
                         </div>
                         <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center">
-                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Nilai Waran OS29</p>
+                            <p class="text-[10px] font-bold uppercase text-blue-200 tracking-wider mb-2">Waran OS29</p>
                             <p class="text-2xl font-black" id="warrant-os29">RM 0.00</p>
                         </div>
                     </div>
@@ -112,7 +136,7 @@
                 <h4 class="text-2xl font-black" id="rem-os29">RM 0.00</h4>
             </div>
             <div id="rem-card-total" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center border-2 transition-all duration-700">
-                <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Jumlah Baki Keseluruhan</p>
+                <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Jumlah Baki Waran</p>
                 <h4 class="text-2xl font-black" id="rem-total">RM 0.00</h4>
             </div>
         </div>
@@ -147,19 +171,19 @@
                 <div class="flex flex-col md:flex-row md:items-center gap-6">
                     <div>
                         <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
-                        <p class="text-sm text-slate-400 mt-1">Status dan pemantauan mengikut Pegawai Meja</p>
+                        <p class="text-sm text-slate-400 mt-1 italic" id="table-subtitle">Status pemantauan prestasi mengikut program.</p>
                     </div>
                     <div id="opr-container" class="hidden">
                         <a id="opr-link" href="#" target="_blank" class="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-5 py-2.5 rounded-2xl text-xs font-bold hover:bg-emerald-200 transition-all border border-emerald-200 shadow-sm text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Buka Laporan OPR (Google Drive)
+                            Buka OPR (Drive)
                         </a>
                     </div>
                 </div>
                 <div class="px-5 py-2 bg-slate-50 rounded-2xl text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-100">
-                    Mata Wang: RM
+                    Unit: RM
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -196,7 +220,6 @@
                     <p class="text-md font-bold text-slate-400 mt-1 tracking-tight">Pusat Dasar dan Inovasi, Institut Aminuddin Baki</p>
                 </div>
             </div>
-            <!-- Decorative circle -->
             <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl"></div>
         </footer>
     </main>
@@ -206,20 +229,23 @@
             analisis: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=0&single=true&output=csv",
             lead: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1435925801&single=true&output=csv",
             coe: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1031215483&single=true&output=csv",
-            assessor: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=2077989648&single=true&output=csv"
+            assessor: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=2077989648&single=true&output=csv",
+            pbd: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZd2KLh_LqBhHbSkRKL0rsoESf60kgFSomuC8kwgZqkLbRvXyqWTqr2DoEzzP15BV491auFw3BdFKd/pub?gid=1683670349&single=true&output=csv"
         };
 
         const OPR_LINKS = {
             coe: "https://drive.google.com/drive/folders/11UGYSgaxB2gE5_IN3KEFxW7u6UMq5K2T?usp=sharing",
             lead: "https://drive.google.com/drive/folders/1BpSD09u0Yk0M6V1kide94BV2h1DpmniI?usp=sharing",
-            assessor: "https://drive.google.com/drive/folders/1OrkvKi8FRF7lMiYY9gbgGTjAo3J1LhDu?usp=sharing"
+            assessor: "https://drive.google.com/drive/folders/1OrkvKi8FRF7lMiYY9gbgGTjAo3J1LhDu?usp=sharing",
+            pbd: "#"
         };
 
         let liveData = {
-            analisis: { title: "Analisis Keseluruhan", items: [], warrant: null },
+            analisis: { title: "Analisis Keseluruhan", items: [], warrant: null, ceiling: null },
             coe: { title: "Pemerkasaan COE", items: [] },
             assessor: { title: "Certified Assessor", items: [] },
-            lead: { title: "Lead Auditor", items: [] }
+            lead: { title: "Lead Auditor", items: [] },
+            pbd: { title: "LDP-PBD", items: [] }
         };
 
         let activeTabKey = 'analisis';
@@ -244,12 +270,8 @@
         function getWarrantStatusClasses(baki, totalWaran) {
             if (totalWaran === 0) return "bg-slate-900 border-slate-700 text-white";
             const ratio = baki / totalWaran;
-            if (baki < 0 || ratio > 0.8) {
-                return "bg-rose-900 border-rose-500 text-white";
-            }
-            if (ratio < 0.2) {
-                return "bg-emerald-900 border-emerald-500 text-white";
-            }
+            if (baki < 0 || ratio > 0.8) return "bg-rose-900 border-rose-500 text-white";
+            if (ratio < 0.2) return "bg-emerald-900 border-emerald-500 text-white";
             return "bg-blue-900 border-blue-500 text-white";
         }
 
@@ -280,17 +302,27 @@
                     const rows = parseCSV(text);
 
                     if (key === 'analisis') {
+                        // Extract Ceiling Info (Row 1)
                         if (rows[1]) {
-                            liveData.analisis.warrant = {
-                                no: rows[0][2] || "-",
-                                details: `${rows[1] ? rows[1][2] : "-"} | Tarikh: ${rows[0][1] || "-"}`,
+                            liveData.analisis.ceiling = {
                                 os21: cleanVal(rows[1][3]),
                                 os29: cleanVal(rows[1][4]),
                                 total: cleanVal(rows[1][5])
                             };
                         }
+                        // Extract Warrant Info (Row 3/4)
+                        if (rows[3]) {
+                            liveData.analisis.warrant = {
+                                no: rows[2][2] || "-",
+                                details: `${rows[3][2]} | Tarikh: ${rows[2][1] || "-"}`,
+                                os21: cleanVal(rows[3][3]),
+                                os29: cleanVal(rows[3][4]),
+                                total: cleanVal(rows[3][5])
+                            };
+                        }
+                        // Summary Rows (Lead Auditor, COE, Certified Assessor, PBD)
                         const items = [];
-                        for(let i=4; i<7; i++) {
+                        for(let i=6; i<10; i++) { // Adjusted for additional PBD row
                             if(rows[i] && rows[i][2]) {
                                 items.push({
                                     name: rows[i][2],
@@ -298,7 +330,8 @@
                                     spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]),
                                     os29: cleanVal(rows[i][4]),
-                                    officer: rows[i][13] || "-", 
+                                    officer: rows[i][14] || "-",
+                                    branch: rows[i][15] || "-", // Pusat/Cawangan
                                     startDate: "-", endDate: "-", participants: "-", location: "-"
                                 });
                             }
@@ -318,7 +351,8 @@
                                     endDate: rows[i][13] || "-",
                                     participants: rows[i][14] || "-",
                                     location: rows[i][15] || "-",
-                                    officer: rows[i][16] || "-" 
+                                    officer: rows[i][16] || "-",
+                                    branch: rows[i][17] || "-" // Pusat/Cawangan
                                 });
                             }
                         }
@@ -326,9 +360,7 @@
                     }
                 }
                 const now = new Date();
-                const formattedDate = now.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
-                const formattedTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-                document.getElementById('update-timestamp').innerText = `Kemas Kini Terakhir: ${formattedDate}, ${formattedTime}`;
+                document.getElementById('update-timestamp').innerText = `Kemas Kini Terakhir: ${now.toLocaleString('ms-MY')}`;
                 updateUI();
             } catch (error) {
                 console.error("Fetch Error:", error);
@@ -344,14 +376,26 @@
             const isAnalisis = activeTabKey === 'analisis';
             
             const mainTable = document.getElementById('main-table');
-            if (isAnalisis) {
-                mainTable.classList.remove('min-w-[1100px]');
-                mainTable.classList.add('min-w-[1000px]');
+            mainTable.className = `w-full text-left ${isAnalisis ? 'min-w-[1000px]' : 'min-w-[1200px]'}`;
+
+            // Ceiling Info (Only Analysis)
+            const ceilingSec = document.getElementById('ceiling-section');
+            if (isAnalisis && liveData.analisis.ceiling) {
+                ceilingSec.classList.remove('hidden');
+                const c = liveData.analisis.ceiling;
+                const totalAlloc = items.reduce((a, b) => a + b.alloc, 0);
+                const bakiSiling = c.total - totalAlloc;
+                
+                document.getElementById('ceiling-total').innerText = formatRM(c.total);
+                document.getElementById('ceiling-balance').innerText = formatRM(bakiSiling);
+                
+                const balCard = document.getElementById('ceiling-balance-card');
+                balCard.className = `p-6 rounded-3xl border text-center min-w-[200px] transition-all ${bakiSiling < 0 ? 'bg-rose-900 border-rose-500' : 'bg-blue-600/20 border-blue-500/30'}`;
             } else {
-                mainTable.classList.add('min-w-[1100px]');
-                mainTable.classList.remove('min-w-[1000px]');
+                ceilingSec.classList.add('hidden');
             }
 
+            // Warrant Info
             const warrantSec = document.getElementById('warrant-section');
             if (isAnalisis && liveData.analisis.warrant) {
                 const w = liveData.analisis.warrant;
@@ -364,13 +408,13 @@
                 warrantSec.classList.add('hidden');
             }
 
+            // Baki Waran logic
             const remSummary = document.getElementById('remaining-warrant-summary');
             if(isAnalisis && liveData.analisis.warrant) {
                 remSummary.classList.remove('hidden');
                 const w = liveData.analisis.warrant;
                 const totalAllocOS21 = items.reduce((a, b) => a + b.os21, 0);
                 const totalAllocOS29 = items.reduce((a, b) => a + b.os29, 0);
-                
                 const bakiOS21 = w.os21 - totalAllocOS21;
                 const bakiOS29 = w.os29 - totalAllocOS29;
                 const bakiTotal = bakiOS21 + bakiOS29;
@@ -388,7 +432,7 @@
 
             const oprContainer = document.getElementById('opr-container');
             const oprLink = document.getElementById('opr-link');
-            if (OPR_LINKS[activeTabKey]) {
+            if (OPR_LINKS[activeTabKey] && OPR_LINKS[activeTabKey] !== "#") {
                 oprContainer.classList.remove('hidden');
                 oprLink.href = OPR_LINKS[activeTabKey];
             } else {
@@ -403,11 +447,11 @@
 
             document.getElementById('kpi-container').innerHTML = `
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm text-center">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Peruntukan Dipohon</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Dipohon</p>
                     <h3 class="text-xl font-black text-blue-600">${formatRM(totalAlloc)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm text-center">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Belanja Sebenar</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Belanja</p>
                     <h3 class="text-xl font-black text-slate-900">${formatRM(totalSpent)}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm text-center">
@@ -415,47 +459,50 @@
                     <h3 class="text-xl font-black text-emerald-600">${formatRM(balance)}</h3>
                 </div>
                 <div class="${perfColor.bg} p-6 rounded-[2rem] border ${perfColor.border} shadow-sm text-center transition-all duration-500">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi Belanja</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Prestasi</p>
                     <h3 class="text-xl font-black ${perfColor.text}">${perc}%</h3>
                 </div>
             `;
 
+            // Update Table Header
             document.getElementById('table-header-row').innerHTML = `
                 <th class="px-8 py-5">Nama Aktiviti / Program</th>
                 ${!isAnalisis ? `
-                    <th class="px-4 py-5 text-center">Tarikh Mula</th>
-                    <th class="px-4 py-5 text-center">Tarikh Akhir</th>
+                    <th class="px-4 py-5 text-center">Tarikh</th>
                     <th class="px-4 py-5 text-center">Peserta</th>
                     <th class="px-4 py-5 text-center">Lokasi</th>
                 ` : ''}
                 <th class="px-6 py-5 text-right">Peruntukan</th>
                 <th class="px-6 py-5 text-right text-slate-900">Belanja</th>
                 <th class="px-6 py-5 text-right text-emerald-600">Baki</th>
-                <th class="px-6 py-5 text-left min-w-[150px]">Pegawai Meja</th>
+                <th class="px-6 py-5 text-left">Pusat/Cawangan</th>
+                <th class="px-6 py-5 text-left">Pegawai Meja</th>
             `;
 
             document.getElementById('table-title').innerText = current.title;
             document.getElementById('table-body').innerHTML = items.length ? items.map(i => {
                 return `
-                    <tr class="hover:bg-slate-50 transition-all group">
+                    <tr class="hover:bg-slate-50 transition-all group text-sm">
                         <td class="px-8 py-5 font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
                             ${i.name}
                         </td>
                         ${!isAnalisis ? `
-                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate}</td>
-                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.endDate}</td>
+                            <td class="px-4 py-5 text-center text-xs text-slate-500 font-medium">${i.startDate} - ${i.endDate}</td>
                             <td class="px-4 py-5 text-center font-bold text-slate-700">${i.participants}</td>
                             <td class="px-4 py-5 text-center text-xs text-slate-500 italic font-medium">${i.location}</td>
                         ` : ''}
                         <td class="px-6 py-5 text-right font-medium text-slate-500">${formatRM(i.alloc)}</td>
                         <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
                         <td class="px-6 py-5 text-right font-black text-emerald-600">${formatRM(i.alloc - i.spent)}</td>
+                        <td class="px-6 py-5 text-left text-xs font-bold text-blue-600/70">
+                            ${i.branch}
+                        </td>
                         <td class="px-6 py-5 text-left text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
                             ${i.officer}
                         </td>
                     </tr>
                 `;
-            }).join('') : `<tr><td colspan="${isAnalisis ? 6 : 10}" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
+            }).join('') : `<tr><td colspan="10" class="px-8 py-10 text-center text-slate-400 italic">Tiada data untuk dipaparkan.</td></tr>`;
 
             renderCharts(items, totalAlloc, totalSpent);
         }
@@ -463,7 +510,6 @@
         function renderCharts(items, totalAlloc, totalSpent) {
             if (mainChart) mainChart.destroy();
             if (pieChart) pieChart.destroy();
-
             const isAnalisis = activeTabKey === 'analisis';
             const ctxMain = document.getElementById('mainChart').getContext('2d');
             
@@ -494,37 +540,27 @@
                     },
                     options: {
                         indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { 
-                            x: { border: { display: false }, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: true },
-                            y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
-                        }
+                        responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                        scales: { x: { border: { display: false }, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: true }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } } }
                     }
                 });
             }
 
             const totalOS21 = items.reduce((a, b) => a + b.os21, 0);
             const totalOS29 = items.reduce((a, b) => a + b.os29, 0);
-
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            pieChart = new Chart(ctxPie, {
+            pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['OS21', 'OS29'],
-                    datasets: [{ data: [totalOS21, totalOS29], backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0, hoverOffset: 20 }]
-                },
+                data: { labels: ['OS21', 'OS29'], datasets: [{ data: [totalOS21, totalOS29], backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0, hoverOffset: 20 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { display: false } } }
             });
 
             document.getElementById('pie-legend').innerHTML = `
                 <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-blue-500 shadow-md shadow-blue-200"></div><span class="text-xs font-bold text-slate-600">OS21</span></div>
+                    <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-blue-500"></div><span class="text-xs font-bold text-slate-600">OS21</span></div>
                     <span class="text-sm font-black text-slate-800">${formatRM(totalOS21)}</span>
                 </div>
                 <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-purple-500 shadow-md shadow-purple-200"></div><span class="text-xs font-bold text-slate-600">OS29</span></div>
+                    <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-purple-500"></div><span class="text-xs font-bold text-slate-600">OS29</span></div>
                     <span class="text-sm font-black text-slate-800">${formatRM(totalOS29)}</span>
                 </div>
             `;
