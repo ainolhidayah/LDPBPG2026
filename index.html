@@ -37,8 +37,11 @@
     <!-- Header Section -->
     <header class="bg-white border-b border-slate-200 px-6 py-8 mb-8 shadow-sm">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-3 rounded-2xl">
+            <div class="flex items-center gap-5">
+                <!-- Logo IAB -->
+                <img src="https://iab.moe.edu.my/images/iablogo.png" alt="Logo IAB" class="h-16 md:h-20 w-auto object-contain" onerror="this.src='https://placehold.co/100x100?text=IAB+LOGO'">
+                
+                <div class="bg-blue-600 p-3 rounded-2xl hidden sm:block">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -55,7 +58,7 @@
                     </svg>
                     Kemaskini Sekarang
                 </button>
-                <p id="update-timestamp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum dikemas kini</p>
+                <p id="update-timestamp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-right">Belum dikemas kini</p>
             </div>
         </div>
     </header>
