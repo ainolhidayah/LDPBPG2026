@@ -18,12 +18,12 @@
         /* Nav Tab Styles */
         .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
         
-        /* High-Contrast Pulsing Yellow Button for Analysis */
+        /* Interactive Pulsing Yellow Button */
         .btn-analisis-custom { 
             background-color: #fbbf24; 
             color: #000; 
             font-weight: 800; 
-            border-color: #d97706;
+            border: 2px solid #d97706;
             animation: pulse-yellow 2s infinite;
         }
         
@@ -40,7 +40,7 @@
             box-shadow: 0 4px 15px rgba(217, 119, 6, 0.5);
         }
 
-        /* Program Button Active State (Dynamic Color) */
+        /* Program Button Active State */
         .tab-btn.active:not(.btn-analisis-custom) { 
             background-color: #2563eb !important; 
             color: #ffffff !important; 
@@ -51,7 +51,7 @@
 
         @keyframes pulse-yellow {
             0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); }
+            70% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); }
             100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
         }
 
@@ -70,7 +70,7 @@
         <div class="flex flex-col items-center text-center px-6">
             <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p class="font-extrabold text-slate-700 text-lg tracking-tight uppercase">Menyusun Paparan Interaktif...</p>
-            <p class="text-slate-400 text-sm">Data sedang dikemas kini</p>
+            <p class="text-slate-400 text-sm italic">Data sedang dikemas kini</p>
         </div>
     </div>
 
@@ -178,7 +178,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     Kemaskini Sekarang
                 </button>
-                <p id="update-timestamp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-right">Memuatkan data...</p>
+                <p id="update-timestamp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-right italic">Memuatkan data...</p>
             </div>
         </div>
     </header>
@@ -193,10 +193,10 @@
             <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">LDP-PBD</button>
         </div>
 
-        <!-- KPI Summary Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10" id="kpi-container"></div>
+        <!-- KPI Summary Grid (Balanced 6 columns) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-10" id="kpi-container"></div>
 
-        <!-- Remaining Warrant Details (Calculated) -->
+        <!-- Remaining Warrant Section -->
         <div id="remaining-warrant-summary" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 hidden">
             <div id="rem-card-os21" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all duration-700">
                 <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Baki Waran OS21</p>
@@ -214,8 +214,7 @@
 
         <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
-            <!-- Line Chart Area -->
-            <div class="lg:col-span-8 bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200">
+            <div class="lg:col-span-8 bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden">
                 <h3 class="text-xl font-bold text-slate-900 mb-10 flex items-center gap-3">
                     <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
                     <span id="chart-main-title">Trend Kewangan Kategori Program</span>
@@ -225,18 +224,15 @@
                 </div>
             </div>
             
-            <!-- Side Charts (Pies) -->
             <div class="lg:col-span-4 space-y-8">
-                <!-- Pie: RM -->
                 <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200 text-center">
                     <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Pecahan Kod OS (RM)</h3>
                     <div style="height: 200px;"><canvas id="pieChart"></canvas></div>
                     <div id="pie-legend" class="mt-8 space-y-3"></div>
                 </div>
 
-                <!-- Pie: Quantity (Only for Overall Analysis) -->
                 <div id="count-pie-container" class="bg-slate-900 p-8 rounded-[3rem] shadow-sm border border-slate-800 hidden text-center">
-                    <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em] mb-8">Agihan Kuantiti Aktiviti</h3>
+                    <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em] mb-8 text-white">Agihan Kuantiti Aktiviti</h3>
                     <div style="height: 200px;"><canvas id="countPieChart"></canvas></div>
                     <div id="count-pie-legend" class="mt-8 space-y-2"></div>
                 </div>
@@ -335,15 +331,15 @@
         }
 
         function getOPRStatus(endDateStr, objective) {
-            if (!endDateStr || endDateStr === "-") return { label: "Belum Mula", class: "bg-slate-100 text-slate-400" };
-            if (objective && objective.length > 5) return { label: "Tersedia", class: "bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm" };
+            if (!endDateStr || endDateStr === "-") return { label: "Belum Mula", class: "bg-slate-100 text-slate-400 border border-slate-200" };
+            if (objective && objective.length > 5) return { label: "Tersedia", class: "bg-emerald-100 text-emerald-700 border border-emerald-200" };
             try {
                 const parts = endDateStr.split('/');
                 const endDate = new Date(parts[2], parts[1]-1, parts[0]);
                 const diffHours = (new Date() - endDate) / (1000 * 60 * 60);
                 if (diffHours > 24) return { label: "Peringatan", class: "bg-amber-100 text-amber-700 font-bold animate-pulse" };
                 return { label: "Dalam Tempoh", class: "bg-blue-50 text-blue-500 border border-blue-100" };
-            } catch(e) { return { label: "Semakan", class: "bg-slate-100 text-slate-500" }; }
+            } catch(e) { return { label: "Semakan", class: "bg-slate-100 text-slate-500 border border-slate-200" }; }
         }
 
         function getProgramCount(name) {
@@ -379,11 +375,11 @@
         function closeOPR() { document.getElementById('opr-modal').classList.add('hidden'); }
 
         function getWarrantStatusClasses(baki, totalWaran) {
-            if (totalWaran === 0) return "bg-slate-900 border-slate-700 text-white";
+            if (totalWaran === 0) return "bg-slate-900 border-slate-700 text-white shadow-sm";
             const ratio = baki / totalWaran;
-            if (baki < 0 || ratio > 0.8) return "bg-rose-900 border-rose-500 text-white";
-            if (ratio < 0.2) return "bg-emerald-900 border-emerald-500 text-white";
-            return "bg-blue-900 border-blue-500 text-white";
+            if (baki < 0 || ratio > 0.8) return "bg-rose-900 border-rose-500 text-white shadow-lg";
+            if (ratio < 0.2) return "bg-emerald-900 border-emerald-500 text-white shadow-lg";
+            return "bg-blue-900 border-blue-500 text-white shadow-lg";
         }
 
         async function fetchAllData() {
@@ -426,8 +422,15 @@
                         liveData[key].items = items;
                     }
                 }
+                
+                // Set the update timestamp
+                const now = new Date();
+                const dStr = now.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const tStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('update-timestamp').innerText = `Kemas kini terakhir: ${dStr}, ${tStr}`;
+                
                 updateUI();
-            } catch (error) { console.error(error); }
+            } catch (error) { console.error(error); document.getElementById('update-timestamp').innerText = "Gagal memuat data"; }
             finally { setTimeout(() => document.getElementById('loading').style.display = 'none', 800); }
         }
 
@@ -450,7 +453,7 @@
             const warrantTotal = isAnalisis && liveData.analisis.warrant ? liveData.analisis.warrant.total : 0;
 
             document.getElementById('kpi-container').innerHTML = `
-                ${isAnalisis ? `<div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>` : ''}
+                <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Bajet Program</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Baki Peruntukan</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
@@ -477,43 +480,43 @@
             document.getElementById('table-header-row').innerHTML = isAnalisis ? `
                 <th class="px-8 py-6">Kategori Program</th>
                 <th class="px-8 py-6 text-left">Pegawai Meja</th>
-                <th class="px-8 py-6 text-left text-blue-600">Pusat/Cawangan</th>
+                <th class="px-8 py-6 text-left text-blue-600 border-l border-slate-100">Pusat/Cawangan</th>
             ` : `
                 <th class="px-8 py-6">Program / Aktiviti</th>
                 <th class="px-4 py-6 text-center">Status</th>
                 <th class="px-4 py-6 text-center">Tarikh Mula</th>
                 <th class="px-4 py-6 text-center">Tarikh Akhir</th>
-                <th class="px-6 py-6 text-right font-black">OS21</th>
+                <th class="px-6 py-6 text-right font-black border-l border-slate-100">OS21</th>
                 <th class="px-6 py-6 text-right font-black">OS29</th>
                 <th class="px-6 py-6 text-right font-black text-blue-600">Bajet (RM)</th>
-                <th class="px-6 py-6 text-right font-black text-slate-900">Belanja</th>
-                <th class="px-6 py-6 text-left">Pegawai Meja</th>
+                <th class="px-6 py-6 text-right font-black text-slate-900 border-l border-slate-100">Belanja</th>
+                <th class="px-6 py-6 text-left border-l border-slate-100">Pegawai Meja</th>
                 <th class="px-6 py-6 text-center">OPR</th>
             `;
 
             document.getElementById('table-body').innerHTML = items.length ? items.map((i, idx) => {
                 if (isAnalisis) {
-                    return `<tr class="hover:bg-slate-50 transition-all text-sm"><td class="px-8 py-6 font-bold text-slate-700 leading-tight">${i.name}</td><td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td><td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight">${i.branch}</td></tr>`;
+                    return `<tr class="hover:bg-slate-50 transition-all text-sm group"><td class="px-8 py-6 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors">${i.name}</td><td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td><td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight border-l border-slate-50">${i.branch}</td></tr>`;
                 } else {
                     const status = getOPRStatus(i.endDate, i.objective);
                     return `
-                        <tr class="hover:bg-slate-50 transition-all text-sm">
-                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight">${i.name}</td>
+                        <tr class="hover:bg-slate-50 transition-all text-sm group">
+                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors">${i.name}</td>
                             <td class="px-4 py-5 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${status.class}">${status.label}</span></td>
                             <td class="px-4 py-5 text-center text-[11px] text-slate-500 font-medium">${i.startDate}</td>
                             <td class="px-4 py-5 text-center text-[11px] text-slate-500 font-medium">${i.endDate}</td>
-                            <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os21)}</td>
+                            <td class="px-6 py-5 text-right font-medium text-slate-400 border-l border-slate-50">${formatRM(i.os21)}</td>
                             <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os29)}</td>
                             <td class="px-6 py-5 text-right font-bold text-blue-600/80">${formatRM(i.alloc)}</td>
-                            <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
-                            <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase leading-snug">${i.officer}<br><span class="text-blue-500 font-semibold normal-case font-medium italic">${i.branch}</span></td>
+                            <td class="px-6 py-5 text-right font-bold text-slate-900 border-l border-slate-50">${formatRM(i.spent)}</td>
+                            <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase leading-snug border-l border-slate-50">${i.officer}<br><span class="text-blue-500 font-semibold normal-case font-medium italic">${i.branch}</span></td>
                             <td class="px-6 py-5 text-center">
                                 ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat OPR</button>` : '<span class="text-slate-300 font-bold text-[10px] uppercase">Tiada OPR</span>'}
                             </td>
                         </tr>
                     `;
                 }
-            }).join('') : `<tr><td colspan="12" class="px-8 py-10 text-center text-slate-300 italic font-medium">Tiada data dijumpai.</td></tr>`;
+            }).join('') : `<tr><td colspan="12" class="px-8 py-10 text-center text-slate-300 italic font-medium">Tiada data yang dijumpai.</td></tr>`;
 
             renderCharts(items);
         }
@@ -524,19 +527,21 @@
             if (countPieChart) countPieChart.destroy();
             const isAnalisis = activeTabKey === 'analisis';
             const ctxMain = document.getElementById('mainChart').getContext('2d');
+            
             if (isAnalisis) {
                 mainChart = new Chart(ctxMain, {
                     type: 'line',
                     data: {
                         labels: items.map(i => i.name.length > 15 ? i.name.substring(0, 12) + "..." : i.name),
                         datasets: [
-                            { label: 'OS21', data: items.map(i => i.os21), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
-                            { label: 'OS29', data: items.map(i => i.os29), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
-                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), borderColor: '#1e293b', backgroundColor: 'rgba(30, 41, 59, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }
+                            { label: 'OS21', data: items.map(i => i.os21), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'OS29', data: items.map(i => i.os29), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), borderColor: '#1e293b', backgroundColor: 'rgba(30, 41, 59, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 }
                         ]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { weight: 'bold' } } } } }
                 });
+
                 document.getElementById('count-pie-container').classList.remove('hidden');
                 const countData = items.map(i => ({ name: i.name, count: getProgramCount(i.name) }));
                 const ctxCount = document.getElementById('countPieChart').getContext('2d');
@@ -544,7 +549,11 @@
                     type: 'pie',
                     data: {
                         labels: countData.map(d => d.name),
-                        datasets: [{ data: countData.map(d => d.count), backgroundColor: ['#6366f1', '#a855f7', '#ec4899', '#f97316', '#14b8a6'], borderWidth: 2, borderColor: '#1e1b4b' }]
+                        datasets: [{
+                            data: countData.map(d => d.count),
+                            backgroundColor: ['#6366f1', '#a855f7', '#ec4899', '#f97316', '#14b8a6'],
+                            borderWidth: 2, borderColor: '#1e1b4b'
+                        }]
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
@@ -562,9 +571,11 @@
                     options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
                 });
             }
+
             const tOS21 = items.reduce((a, b) => a + (b.os21 || 0), 0);
             const tOS29 = items.reduce((a, b) => a + (b.os29 || 0), 0);
-            pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            pieChart = new Chart(ctxPie, {
                 type: 'doughnut',
                 data: { labels: ['OS21', 'OS29'], datasets: [{ data: [tOS21, tOS29], backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
