@@ -16,13 +16,36 @@
         .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         
         /* Nav Tab Styles */
-        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn { transition: all 0.2s ease-in-out; border: 2px solid transparent; }
         .tab-btn:active { transform: scale(0.95); }
         
-        /* High Contrast Yellow Button for Overall Analysis */
-        .btn-analisis-custom { background-color: #fbbf24; color: #000; border: 2px solid #d97706; }
-        .btn-analisis-custom:hover { background-color: #f59e0b; opacity: 0.9; }
-        .btn-analisis-custom.active { background-color: #d97706 !important; color: #fff !important; box-shadow: 0 0 15px rgba(217, 119, 6, 0.4); }
+        /* High-Contrast Pulsing Yellow Button for Analysis */
+        .btn-analisis-custom { 
+            background-color: #fbbf24; 
+            color: #000; 
+            font-weight: 800; 
+            border-color: #d97706;
+            animation: pulse-yellow 2s infinite;
+        }
+        
+        .btn-analisis-custom:hover { 
+            background-color: #f59e0b; 
+            animation: none; /* Stop pulse on hover for interaction feedback */
+        }
+        
+        .btn-analisis-custom.active { 
+            background-color: #d97706 !important; 
+            color: #fff !important; 
+            border-color: #92400e; 
+            animation: none; /* Stop pulse when active to focus on content */
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+        }
+
+        @keyframes pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+        }
 
         /* OPR Template Print Styles */
         @media print {
@@ -39,8 +62,8 @@
     <div id="loading" class="loading-overlay">
         <div class="flex flex-col items-center text-center px-6">
             <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="font-extrabold text-slate-700 text-lg tracking-tight">Menjana Dashboard & Laporan OPR...</p>
-            <p class="text-slate-400 text-sm">Menyusun data masa nyata daripada Google Sheets</p>
+            <p class="font-extrabold text-slate-700 text-lg tracking-tight uppercase">Memuatkan Dashboard Interaktif...</p>
+            <p class="text-slate-400 text-sm">Menyusun data kewangan & laporan OPR</p>
         </div>
     </div>
 
@@ -59,7 +82,6 @@
 
             <!-- OPR TEMPLATE -->
             <div class="p-12" id="printable-area">
-                <!-- Header -->
                 <div class="flex justify-between items-center border-b-4 border-slate-800 pb-6 mb-8">
                     <div class="flex items-center gap-6">
                         <img src="logoiab.png" alt="Logo IAB" class="h-16 w-auto object-contain" onerror="this.src='https://iab.moe.edu.my/images/iablogo.png'">
@@ -74,12 +96,10 @@
                     </div>
                 </div>
 
-                <!-- Program Title -->
                 <div class="bg-slate-900 text-white p-8 mb-8 text-center shadow-xl">
                     <h3 class="text-2xl font-black uppercase leading-tight tracking-tight" id="opr-title-display">-</h3>
                 </div>
 
-                <!-- Main Activity Image -->
                 <div class="w-full h-80 bg-slate-100 mb-10 overflow-hidden flex items-center justify-center border border-slate-200 rounded-sm shadow-inner relative">
                     <img id="opr-main-img" src="" alt="Aktiviti" class="w-full h-full object-cover hidden">
                     <div id="opr-img-placeholder" class="text-slate-300 flex flex-col items-center">
@@ -89,25 +109,23 @@
                 </div>
 
                 <div class="grid grid-cols-12 gap-12">
-                    <!-- Column Left: Objective & Activities -->
-                    <div class="col-span-12 md:col-span-5 border-r-2 border-slate-100 pr-8">
+                    <div class="col-span-12 md:col-span-5 border-r-2 border-slate-100 pr-8 text-justify">
                         <div class="mb-10">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-2.5 h-8 bg-blue-600"></div>
                                 <h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Objektif</h4>
                             </div>
-                            <p class="text-[13px] text-slate-700 leading-relaxed text-justify italic font-medium" id="opr-objective-display">-</p>
+                            <p class="text-[13px] text-slate-700 leading-relaxed italic font-medium" id="opr-objective-display">-</p>
                         </div>
                         <div>
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-2.5 h-8 bg-blue-600"></div>
                                 <h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Aktiviti Utama</h4>
                             </div>
-                            <p class="text-[13px] text-slate-700 leading-relaxed text-justify" id="opr-activity-display">-</p>
+                            <p class="text-[13px] text-slate-700 leading-relaxed" id="opr-activity-display">-</p>
                         </div>
                     </div>
 
-                    <!-- Column Right: Impact & Gallery -->
                     <div class="col-span-12 md:col-span-7">
                         <div class="mb-10">
                             <div class="flex items-center gap-3 mb-4">
@@ -122,15 +140,14 @@
                             <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest">Galeri Aktiviti</h4>
                         </div>
                         <div class="grid grid-cols-4 gap-4">
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-1" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-2" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-3" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-4" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-1" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-2" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-3" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-4" src="" class="w-full h-full object-cover hidden"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Footer OPR -->
                 <div class="mt-16 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
                     <p>Dashboard LDP-BPG 050202 Live Report</p>
                     <p id="opr-footer-date"></p>
@@ -139,14 +156,14 @@
         </div>
     </div>
 
-    <!-- Main Header -->
+    <!-- Header Section -->
     <header class="bg-white border-b border-slate-200 px-6 py-8 mb-8 shadow-sm">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
                 <img src="logoiab.png" alt="Logo IAB" class="h-16 md:h-20 w-auto object-contain" onerror="this.src='https://iab.moe.edu.my/images/iablogo.png'">
                 <div>
                     <h1 class="text-xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight uppercase">DASHBOARD PERBELANJAAN PERUNTUKAN LDP-BPG 050202</h1>
-                    <p class="text-slate-500 font-medium tracking-tight">Pusat Pengurusan Dasar dan Inovasi, Institut Aminuddin Baki (IAB)</p>
+                    <p class="text-slate-500 font-medium tracking-tight uppercase">Pusat Pengurusan Dasar dan Inovasi, Institut Aminuddin Baki (IAB)</p>
                 </div>
             </div>
             <div class="flex flex-col items-end gap-2 text-right">
@@ -160,7 +177,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6">
-        <!-- Navigation -->
+        <!-- Navigation Tabs -->
         <div class="flex flex-wrap gap-4 mb-10 bg-slate-200/40 p-2.5 rounded-[2rem] w-fit shadow-inner">
             <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn btn-analisis-custom active px-10 py-3.5 rounded-[1.5rem] text-sm font-black uppercase tracking-wider">Analisis Keseluruhan</button>
             <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Pemerkasaan COE</button>
@@ -169,10 +186,10 @@
             <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">LDP-PBD</button>
         </div>
 
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-10" id="kpi-container"></div>
+        <!-- KPI Summary Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10" id="kpi-container"></div>
 
-        <!-- Remaining Warrant Summary -->
+        <!-- Remaining Warrant Details (Calculated) -->
         <div id="remaining-warrant-summary" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 hidden">
             <div id="rem-card-os21" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all duration-700">
                 <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Baki Waran OS21</p>
@@ -188,13 +205,13 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
+        <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
-            <!-- Line Chart (Reverted to Line as per request) -->
+            <!-- Line Chart Area -->
             <div class="lg:col-span-8 bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200">
                 <h3 class="text-xl font-bold text-slate-900 mb-10 flex items-center gap-3">
                     <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-                    <span id="chart-main-title">Trend Peruntukan vs Belanja Sebenar</span>
+                    <span id="chart-main-title">Trend Kewangan Kategori Program</span>
                 </h3>
                 <div class="chart-container">
                     <canvas id="mainChart"></canvas>
@@ -203,28 +220,26 @@
             
             <!-- Side Charts (Pies) -->
             <div class="lg:col-span-4 space-y-8">
-                <!-- Pie Chart: Financial Breakdown -->
-                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8 text-center">Pecahan Kod OS (RM)</h3>
+                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200 text-center">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Pecahan Kod OS (RM)</h3>
                     <div style="height: 200px;"><canvas id="pieChart"></canvas></div>
                     <div id="pie-legend" class="mt-8 space-y-3"></div>
                 </div>
 
-                <!-- Pie Chart: Program Counts (Only for Analysis) -->
-                <div id="count-pie-container" class="bg-indigo-950 p-8 rounded-[3rem] shadow-sm border border-indigo-900 hidden transition-all duration-500">
-                    <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em] mb-8 text-center">Agihan Bilangan Aktiviti</h3>
+                <div id="count-pie-container" class="bg-slate-900 p-8 rounded-[3rem] shadow-sm border border-slate-800 hidden text-center">
+                    <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em] mb-8">Agihan Kuantiti Aktiviti</h3>
                     <div style="height: 200px;"><canvas id="countPieChart"></canvas></div>
                     <div id="count-pie-legend" class="mt-8 space-y-2"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Data Table -->
+        <!-- Data Table Container -->
         <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden mb-12">
-            <div class="p-10 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div class="p-10 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h3 class="text-2xl font-black text-slate-900" id="table-title">Senarai Program</h3>
-                    <p class="text-sm text-slate-400 mt-2 font-medium italic" id="table-subtitle">Memuatkan butiran...</p>
+                    <p class="text-sm text-slate-400 mt-2 font-medium italic" id="table-subtitle">Data perincian aktiviti.</p>
                 </div>
                 <div class="px-5 py-2.5 bg-slate-50 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border border-slate-200">
                     Mata Wang: RM
@@ -243,9 +258,9 @@
         <!-- Urus Setia Footer -->
         <footer class="bg-slate-900 text-white rounded-[3.5rem] p-16 shadow-2xl relative overflow-hidden mb-12 no-print">
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div class="space-y-8">
+                <div class="space-y-8 text-slate-100">
                     <h3 class="text-2xl font-black text-blue-400 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-6">Urus Setia Dashboard</h3>
-                    <div class="space-y-6 text-slate-100">
+                    <div class="space-y-6 text-sm">
                         <div class="flex items-start gap-4">
                             <div class="w-1 h-12 bg-blue-500/30 mt-1"></div>
                             <div>
@@ -260,20 +275,18 @@
                                 <p class="text-blue-400 text-xs font-black uppercase tracking-widest mt-1">Ketua Jabatan</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-4">
-                            <div class="w-1 h-8 bg-slate-500/30 mt-1"></div>
+                        <div class="flex items-start gap-4 pl-5">
                             <p class="text-xl font-extrabold text-slate-400 tracking-tight">Puan Ainol Hidayah binti Abdul Rauof</p>
                         </div>
                     </div>
                 </div>
                 <div class="bg-white/5 p-10 rounded-[2.5rem] border border-white/10 shadow-inner flex flex-col items-center lg:items-end text-center lg:text-right">
-                    <p class="text-xs font-black text-blue-300 uppercase italic mb-4 tracking-widest">Pusat Bertanggungjawab:</p>
-                    <p class="text-3xl font-black leading-tight uppercase tracking-tighter mb-2">Jabatan Pembangunan Staf</p>
-                    <p class="text-lg font-bold text-slate-400 tracking-tight uppercase leading-snug">Pusat Pengurusan Dasar dan Inovasi</p>
-                    <p class="text-md font-medium text-slate-500 mt-2">Institut Aminuddin Baki (IAB)</p>
+                    <p class="text-xs font-black text-blue-300 uppercase italic mb-4 tracking-widest text-right uppercase">Unit Bertanggungjawab:</p>
+                    <p class="text-3xl font-black leading-tight uppercase tracking-tighter mb-2 text-right">Jabatan Pembangunan Staf</p>
+                    <p class="text-lg font-bold text-slate-400 tracking-tight uppercase leading-snug text-right">Pusat Pengurusan Dasar dan Inovasi</p>
+                    <p class="text-md font-medium text-slate-500 mt-2 text-right">Institut Aminuddin Baki (IAB)</p>
                 </div>
             </div>
-            <!-- Background element -->
             <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]"></div>
         </footer>
     </main>
@@ -415,8 +428,7 @@
             const isAnalisis = activeTabKey === 'analisis';
             
             const mainTable = document.getElementById('main-table');
-            mainTable.className = `w-full text-left ${isAnalisis ? 'min-w-[800px]' : 'min-w-[1300px]'}`;
-            document.getElementById('table-subtitle').innerText = isAnalisis ? "Data pegawai meja mengikut kategori program." : "Data perincian dan penjanaan laporan OPR.";
+            mainTable.className = `w-full text-left border-collapse ${isAnalisis ? 'min-w-[800px]' : 'min-w-[1350px]'}`;
 
             const tAlloc = items.reduce((a, b) => a + b.alloc, 0);
             const tSpent = items.reduce((a, b) => a + b.spent, 0);
@@ -430,11 +442,11 @@
 
             document.getElementById('kpi-container').innerHTML = `
                 ${isAnalisis ? `<div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>` : ''}
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Dipohon</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Baki Semasa</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Prestasi</p><h3 class="text-xl font-black text-blue-800">${perc}%</h3></div>
-                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-200 text-center shadow-sm border-2"><p class="text-indigo-500 text-[10px] font-black uppercase mb-2 tracking-widest">Status OPR</p><h3 class="text-xl font-black text-indigo-700">${isAnalisis ? tOPRReady + ' / ' + tOPRTotal : items.filter(i => (i.objective && i.objective.length > 5)).length + ' / ' + items.length}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Bajet Program</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Baki Peruntukan</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Prestasi</p><h3 class="text-xl font-black text-blue-800">${perc}%</h3></div>
+                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-200 text-center shadow-sm border-2"><p class="text-indigo-600 text-[10px] font-black uppercase mb-2 tracking-widest">Laporan OPR</p><h3 class="text-xl font-black text-indigo-700">${isAnalisis ? tOPRReady + ' / ' + tOPRTotal : items.filter(i => (i.objective && i.objective.length > 5)).length + ' / ' + items.length}</h3></div>
             `;
 
             const remSummary = document.getElementById('remaining-warrant-summary');
@@ -454,19 +466,20 @@
             } else { remSummary.classList.add('hidden'); }
 
             document.getElementById('table-header-row').innerHTML = isAnalisis ? `
-                <th class="px-8 py-5">Kategori Program</th>
-                <th class="px-8 py-5 text-left">Pegawai Meja</th>
-                <th class="px-8 py-5 text-left text-blue-600">Pusat/Cawangan</th>
+                <th class="px-8 py-6">Kategori Program</th>
+                <th class="px-8 py-6 text-left">Pegawai Meja</th>
+                <th class="px-8 py-6 text-left text-blue-600">Pusat/Cawangan</th>
             ` : `
-                <th class="px-8 py-5">Program / Aktiviti</th>
-                <th class="px-4 py-5 text-center">Status</th>
-                <th class="px-4 py-5 text-center">Tarikh</th>
-                <th class="px-6 py-5 text-right">OS21</th>
-                <th class="px-6 py-5 text-right">OS29</th>
-                <th class="px-6 py-5 text-right font-bold text-blue-600">Bajet (RM)</th>
-                <th class="px-6 py-5 text-right font-bold text-slate-900">Belanja</th>
-                <th class="px-6 py-5 text-left">Pegawai Meja</th>
-                <th class="px-6 py-5 text-center">Tindakan</th>
+                <th class="px-8 py-6">Program / Aktiviti</th>
+                <th class="px-4 py-6 text-center">Status</th>
+                <th class="px-4 py-6 text-center">Tarikh Mula</th>
+                <th class="px-4 py-6 text-center">Tarikh Akhir</th>
+                <th class="px-6 py-6 text-right font-black">OS21</th>
+                <th class="px-6 py-6 text-right font-black">OS29</th>
+                <th class="px-6 py-6 text-right font-black text-blue-600">Bajet (RM)</th>
+                <th class="px-6 py-6 text-right font-black text-slate-900">Belanja</th>
+                <th class="px-6 py-6 text-left">Pegawai Meja</th>
+                <th class="px-6 py-6 text-center">OPR</th>
             `;
 
             document.getElementById('table-body').innerHTML = items.length ? items.map((i, idx) => {
@@ -482,18 +495,19 @@
                     const status = getOPRStatus(i.endDate, i.objective);
                     return `
                         <tr class="hover:bg-slate-50 transition-all text-sm">
-                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight">${i.name}</td>
-                            <td class="px-4 py-5 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${status.class}">${status.label}</span></td>
-                            <td class="px-4 py-5 text-center text-[11px] text-slate-500 font-medium">${i.endDate}</td>
-                            <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os21)}</td>
-                            <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os29)}</td>
-                            <td class="px-6 py-5 text-right font-bold text-blue-600/80">${formatRM(i.alloc)}</td>
-                            <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
-                            <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase leading-snug">
-                                ${i.officer}<br><span class="text-blue-500 font-semibold normal-case">${i.branch}</span>
+                            <td class="px-8 py-6 font-bold text-slate-700 leading-tight">${i.name}</td>
+                            <td class="px-4 py-6 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${status.class}">${status.label}</span></td>
+                            <td class="px-4 py-6 text-center text-[11px] text-slate-500 font-medium">${i.startDate}</td>
+                            <td class="px-4 py-6 text-center text-[11px] text-slate-500 font-medium">${i.endDate}</td>
+                            <td class="px-6 py-6 text-right font-medium text-slate-400">${formatRM(i.os21)}</td>
+                            <td class="px-6 py-6 text-right font-medium text-slate-400">${formatRM(i.os29)}</td>
+                            <td class="px-6 py-6 text-right font-bold text-blue-600/80">${formatRM(i.alloc)}</td>
+                            <td class="px-6 py-6 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
+                            <td class="px-6 py-6 text-left text-[10px] font-bold text-slate-900 uppercase leading-snug">
+                                ${i.officer}<br><span class="text-blue-500 font-semibold normal-case font-medium italic">${i.branch}</span>
                             </td>
-                            <td class="px-6 py-5 text-center">
-                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat OPR</button>` : '<span class="text-slate-300 font-bold text-[10px]">Tiada OPR</span>'}
+                            <td class="px-6 py-6 text-center">
+                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat OPR</button>` : '<span class="text-slate-300 font-bold text-[10px] uppercase">Tiada OPR</span>'}
                             </td>
                         </tr>
                     `;
@@ -512,21 +526,21 @@
             const ctxMain = document.getElementById('mainChart').getContext('2d');
             
             if (isAnalisis) {
-                // Reverted to Line Chart as requested
+                // Return to Line Chart for Analysis
                 mainChart = new Chart(ctxMain, {
                     type: 'line',
                     data: {
-                        labels: items.map(i => i.name.substring(0, 15) + "..."),
+                        labels: items.map(i => i.name.length > 15 ? i.name.substring(0, 12) + "..." : i.name),
                         datasets: [
-                            { label: 'OS21', data: items.map(i => i.os21), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
-                            { label: 'OS29', data: items.map(i => i.os29), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
-                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), borderColor: '#1e293b', backgroundColor: 'rgba(30, 41, 59, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }
+                            { label: 'OS21', data: items.map(i => i.os21), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5 },
+                            { label: 'OS29', data: items.map(i => i.os29), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5 },
+                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), borderColor: '#1e293b', backgroundColor: 'rgba(30, 41, 59, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5 }
                         ]
                     },
                     options: { 
                         responsive: true, maintainAspectRatio: false,
                         plugins: { legend: { position: 'top', labels: { font: { weight: 'bold', size: 10 } } } },
-                        scales: { y: { beginAtZero: true }, x: { ticks: { font: { weight: 'bold' } } } }
+                        scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { weight: 'bold', size: 9 } } } }
                     }
                 });
 
@@ -546,8 +560,8 @@
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
                 document.getElementById('count-pie-legend').innerHTML = countData.map(d => `
-                    <div class="flex justify-between items-center text-[10px] text-indigo-100 font-bold uppercase">
-                        <span>${d.name}</span><span class="bg-indigo-400/20 px-2 py-0.5 rounded text-white">${d.count} Aktiviti</span>
+                    <div class="flex justify-between items-center text-[10px] text-indigo-100 font-bold uppercase tracking-tight">
+                        <span>${d.name}</span><span class="bg-blue-400/20 px-2 py-0.5 rounded text-white">${d.count} Aktiviti</span>
                     </div>
                 `).join('');
             } else {
@@ -583,7 +597,6 @@
             activeTabKey = key;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.id !== 'btn-analisis') { btn.classList.replace('text-slate-700', 'text-slate-500'); }
             });
             document.getElementById(`btn-${key}`).classList.add('active');
             updateUI();
