@@ -15,15 +15,16 @@
         .chart-container { position: relative; height: 350px; width: 100%; }
         .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         
-        /* Tab Styles */
-        .tab-btn { transition: all 0.3s ease; }
-        .tab-btn.active { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); transform: translateY(-1px); }
+        /* Nav Tab Styles */
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn:active { transform: scale(0.95); }
         
-        /* Specialized Yellow Button for Analysis */
-        .btn-analisis-custom { background-color: #facc15; color: #1e293b; }
-        .btn-analisis-custom:hover { background-color: #eab308; }
-        .btn-analisis-custom.active { background-color: #eab308 !important; color: #000 !important; border: 2px solid #854d0e; }
+        /* High Contrast Yellow Button for Overall Analysis */
+        .btn-analisis-custom { background-color: #fbbf24; color: #000; border: 2px solid #d97706; }
+        .btn-analisis-custom:hover { background-color: #f59e0b; opacity: 0.9; }
+        .btn-analisis-custom.active { background-color: #d97706 !important; color: #fff !important; box-shadow: 0 0 15px rgba(217, 119, 6, 0.4); }
 
+        /* OPR Template Print Styles */
         @media print {
             body * { visibility: hidden; }
             #opr-modal, #opr-modal-content, #opr-modal-content * { visibility: visible; }
@@ -36,10 +37,10 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
 
     <div id="loading" class="loading-overlay">
-        <div class="flex flex-col items-center">
+        <div class="flex flex-col items-center text-center px-6">
             <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="font-extrabold text-slate-700 text-lg tracking-tight text-center">Menjana Visualisasi Kewangan & Laporan...</p>
-            <p class="text-slate-400 text-sm">Sila tunggu sebentar</p>
+            <p class="font-extrabold text-slate-700 text-lg tracking-tight">Menjana Dashboard & Laporan OPR...</p>
+            <p class="text-slate-400 text-sm">Menyusun data masa nyata daripada Google Sheets</p>
         </div>
     </div>
 
@@ -56,7 +57,9 @@
                 </button>
             </div>
 
+            <!-- OPR TEMPLATE -->
             <div class="p-12" id="printable-area">
+                <!-- Header -->
                 <div class="flex justify-between items-center border-b-4 border-slate-800 pb-6 mb-8">
                     <div class="flex items-center gap-6">
                         <img src="logoiab.png" alt="Logo IAB" class="h-16 w-auto object-contain" onerror="this.src='https://iab.moe.edu.my/images/iablogo.png'">
@@ -71,10 +74,12 @@
                     </div>
                 </div>
 
+                <!-- Program Title -->
                 <div class="bg-slate-900 text-white p-8 mb-8 text-center shadow-xl">
                     <h3 class="text-2xl font-black uppercase leading-tight tracking-tight" id="opr-title-display">-</h3>
                 </div>
 
+                <!-- Main Activity Image -->
                 <div class="w-full h-80 bg-slate-100 mb-10 overflow-hidden flex items-center justify-center border border-slate-200 rounded-sm shadow-inner relative">
                     <img id="opr-main-img" src="" alt="Aktiviti" class="w-full h-full object-cover hidden">
                     <div id="opr-img-placeholder" class="text-slate-300 flex flex-col items-center">
@@ -84,6 +89,7 @@
                 </div>
 
                 <div class="grid grid-cols-12 gap-12">
+                    <!-- Column Left: Objective & Activities -->
                     <div class="col-span-12 md:col-span-5 border-r-2 border-slate-100 pr-8">
                         <div class="mb-10">
                             <div class="flex items-center gap-3 mb-4">
@@ -101,13 +107,14 @@
                         </div>
                     </div>
 
+                    <!-- Column Right: Impact & Gallery -->
                     <div class="col-span-12 md:col-span-7">
                         <div class="mb-10">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-2.5 h-8 bg-emerald-500"></div>
                                 <h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Impak / Hasil</h4>
                             </div>
-                            <p class="text-[13px] text-slate-700 leading-relaxed text-justify" id="opr-impact-display">-</p>
+                            <p class="text-[13px] text-slate-700 leading-relaxed text-justify italic font-medium" id="opr-impact-display">-</p>
                         </div>
                         
                         <div class="flex items-center gap-3 mb-6">
@@ -115,14 +122,15 @@
                             <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest">Galeri Aktiviti</h4>
                         </div>
                         <div class="grid grid-cols-4 gap-4">
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-1" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-2" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-3" src="" class="w-full h-full object-cover hidden"></div>
-                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm shadow-sm"><img id="opr-extra-4" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-1" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-2" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-3" src="" class="w-full h-full object-cover hidden"></div>
+                            <div class="aspect-square bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden rounded-sm"><img id="opr-extra-4" src="" class="w-full h-full object-cover hidden"></div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Footer OPR -->
                 <div class="mt-16 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
                     <p>Dashboard LDP-BPG 050202 Live Report</p>
                     <p id="opr-footer-date"></p>
@@ -153,106 +161,120 @@
 
     <main class="max-w-7xl mx-auto px-6">
         <!-- Navigation -->
-        <nav class="flex flex-wrap gap-3 mb-10 bg-slate-200/40 p-2 rounded-2xl w-fit">
-            <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn btn-analisis-custom active px-8 py-3 rounded-xl text-sm font-extrabold transition-all border-2 border-transparent">Analisis Keseluruhan</button>
-            <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-3 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/50 hover:bg-white">Pemerkasaan COE</button>
-            <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-3 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/50 hover:bg-white">Certified Assessor</button>
-            <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-3 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/50 hover:bg-white">Lead Auditor</button>
-            <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/50 hover:bg-white">LDP-PBD</button>
-        </nav>
+        <div class="flex flex-wrap gap-4 mb-10 bg-slate-200/40 p-2.5 rounded-[2rem] w-fit shadow-inner">
+            <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn btn-analisis-custom active px-10 py-3.5 rounded-[1.5rem] text-sm font-black uppercase tracking-wider">Analisis Keseluruhan</button>
+            <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Pemerkasaan COE</button>
+            <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Certified Assessor</button>
+            <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Lead Auditor</button>
+            <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">LDP-PBD</button>
+        </div>
 
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-10" id="kpi-container"></div>
 
-        <!-- Ceiling Section (Only Analysis) -->
-        <div id="ceiling-section" class="mb-10 hidden">
-            <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border-b-8 border-blue-600">
-                <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-                    <div class="max-w-lg">
-                        <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-blue-400">SYILING AGIHAN PERUNTUKAN LDP-050202 IAB 2026</span>
-                        <h2 class="text-2xl font-black mt-4 leading-tight uppercase tracking-tight italic">Ringkasan Syiling & Baki</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:w-auto text-center text-white">
-                        <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 min-w-[220px]">
-                            <p class="text-[10px] font-bold uppercase opacity-60 mb-2 tracking-widest">Jumlah Syiling</p>
-                            <p class="text-2xl font-black" id="ceiling-total">RM 0.00</p>
-                        </div>
-                        <div id="ceiling-balance-card" class="p-6 rounded-3xl border min-w-[220px]">
-                            <p class="text-[10px] font-bold uppercase opacity-80 mb-2 tracking-widest">Baki Syiling</p>
-                            <p class="text-2xl font-black" id="ceiling-balance">RM 0.00</p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Remaining Warrant Summary -->
+        <div id="remaining-warrant-summary" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 hidden">
+            <div id="rem-card-os21" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all duration-700">
+                <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Baki Waran OS21</p>
+                <h4 class="text-2xl font-black" id="rem-os21">RM 0.00</h4>
+            </div>
+            <div id="rem-card-os29" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all duration-700">
+                <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Baki Waran OS29</p>
+                <h4 class="text-2xl font-black" id="rem-os29">RM 0.00</h4>
+            </div>
+            <div id="rem-card-total" class="p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center border-2 transition-all duration-700">
+                <p class="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 opacity-80">Jumlah Baki Waran</p>
+                <h4 class="text-2xl font-black" id="rem-total">RM 0.00</h4>
             </div>
         </div>
 
-        <!-- Charts Grid -->
+        <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
-            <!-- Main Performance Chart -->
-            <div class="lg:col-span-8 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-8" id="chart-main-title">Perbandingan Bajet vs Belanja Sebenar</h3>
+            <!-- Line Chart (Reverted to Line as per request) -->
+            <div class="lg:col-span-8 bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-900 mb-10 flex items-center gap-3">
+                    <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                    <span id="chart-main-title">Trend Peruntukan vs Belanja Sebenar</span>
+                </h3>
                 <div class="chart-container">
                     <canvas id="mainChart"></canvas>
                 </div>
             </div>
             
-            <!-- Side Charts (Pie) -->
+            <!-- Side Charts (Pies) -->
             <div class="lg:col-span-4 space-y-8">
-                <!-- Pie 1: Kewangan -->
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-6 text-center">Pecahan Kod OS (Keseluruhan)</h3>
-                    <div style="height: 180px;"><canvas id="pieChart"></canvas></div>
-                    <div id="pie-legend" class="mt-6 space-y-2"></div>
+                <!-- Pie Chart: Financial Breakdown -->
+                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8 text-center">Pecahan Kod OS (RM)</h3>
+                    <div style="height: 200px;"><canvas id="pieChart"></canvas></div>
+                    <div id="pie-legend" class="mt-8 space-y-3"></div>
                 </div>
 
-                <!-- Pie 2: Kuantiti Program -->
-                <div id="count-pie-container" class="bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-800 hidden">
-                    <h3 class="text-xs font-bold text-blue-300 uppercase tracking-[0.2em] mb-6 text-center">Agihan Kuantiti Aktiviti</h3>
-                    <div style="height: 180px;"><canvas id="countPieChart"></canvas></div>
-                    <div id="count-pie-legend" class="mt-6 space-y-2"></div>
+                <!-- Pie Chart: Program Counts (Only for Analysis) -->
+                <div id="count-pie-container" class="bg-indigo-950 p-8 rounded-[3rem] shadow-sm border border-indigo-900 hidden transition-all duration-500">
+                    <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em] mb-8 text-center">Agihan Bilangan Aktiviti</h3>
+                    <div style="height: 200px;"><canvas id="countPieChart"></canvas></div>
+                    <div id="count-pie-legend" class="mt-8 space-y-2"></div>
                 </div>
             </div>
         </div>
 
         <!-- Main Data Table -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden mb-12">
-            <div class="p-8 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden mb-12">
+            <div class="p-10 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-900" id="table-title">Senarai Program</h3>
-                    <p class="text-sm text-slate-400 mt-1 italic leading-relaxed" id="table-subtitle">Data perincian aktiviti.</p>
+                    <h3 class="text-2xl font-black text-slate-900" id="table-title">Senarai Program</h3>
+                    <p class="text-sm text-slate-400 mt-2 font-medium italic" id="table-subtitle">Memuatkan butiran...</p>
                 </div>
-                <div class="px-5 py-2 bg-slate-50 rounded-2xl text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-100">
+                <div class="px-5 py-2.5 bg-slate-50 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border border-slate-200">
                     Mata Wang: RM
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse" id="main-table">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-[0.15em] border-b border-slate-100" id="table-header-row"></tr>
+                        <tr class="bg-slate-50/80 text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] border-b border-slate-100" id="table-header-row"></tr>
                     </thead>
-                    <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
+                    <tbody id="table-body" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- Urus Setia Footer -->
-        <footer class="bg-slate-900 text-white rounded-[3rem] p-12 shadow-2xl relative overflow-hidden mb-12 no-print">
-            <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6 text-slate-200">
-                    <h3 class="text-xl font-black text-blue-400 uppercase tracking-widest border-l-4 border-blue-500 pl-4">Urus Setia Dashboard LDP-BPG</h3>
-                    <div class="space-y-5">
-                        <div><p class="text-lg font-extrabold tracking-tight">Puan Rashidah binti Mohd Said</p><p class="text-blue-400 text-xs font-bold uppercase tracking-widest">Ketua Pusat</p></div>
-                        <div><p class="text-lg font-extrabold tracking-tight">Encik Mohamed Khaidir bin Alias</p><p class="text-blue-400 text-xs font-bold uppercase tracking-widest">Ketua Jabatan</p></div>
-                        <div><p class="text-lg font-extrabold text-slate-300 tracking-tight">Puan Ainol Hidayah binti Abdul Rauof</p></div>
+        <footer class="bg-slate-900 text-white rounded-[3.5rem] p-16 shadow-2xl relative overflow-hidden mb-12 no-print">
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <h3 class="text-2xl font-black text-blue-400 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-6">Urus Setia Dashboard</h3>
+                    <div class="space-y-6 text-slate-100">
+                        <div class="flex items-start gap-4">
+                            <div class="w-1 h-12 bg-blue-500/30 mt-1"></div>
+                            <div>
+                                <p class="text-xl font-extrabold tracking-tight">Puan Rashidah binti Mohd Said</p>
+                                <p class="text-blue-400 text-xs font-black uppercase tracking-widest mt-1">Ketua Pusat</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-1 h-12 bg-blue-500/30 mt-1"></div>
+                            <div>
+                                <p class="text-xl font-extrabold tracking-tight">Encik Mohamed Khaidir bin Alias</p>
+                                <p class="text-blue-400 text-xs font-black uppercase tracking-widest mt-1">Ketua Jabatan</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-1 h-8 bg-slate-500/30 mt-1"></div>
+                            <p class="text-xl font-extrabold text-slate-400 tracking-tight">Puan Ainol Hidayah binti Abdul Rauof</p>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 shadow-inner text-right md:text-left">
-                    <p class="text-xs font-bold text-blue-300 uppercase italic mb-3 tracking-widest text-right">Penyediaan Laporan:</p>
-                    <p class="text-xl font-black leading-tight uppercase tracking-tight text-right">Jabatan Pembangunan Staf</p>
-                    <p class="text-md font-bold text-slate-400 tracking-tight mt-1 uppercase text-right leading-snug">Pusat Pengurusan Dasar dan Inovasi, IAB</p>
+                <div class="bg-white/5 p-10 rounded-[2.5rem] border border-white/10 shadow-inner flex flex-col items-center lg:items-end text-center lg:text-right">
+                    <p class="text-xs font-black text-blue-300 uppercase italic mb-4 tracking-widest">Pusat Bertanggungjawab:</p>
+                    <p class="text-3xl font-black leading-tight uppercase tracking-tighter mb-2">Jabatan Pembangunan Staf</p>
+                    <p class="text-lg font-bold text-slate-400 tracking-tight uppercase leading-snug">Pusat Pengurusan Dasar dan Inovasi</p>
+                    <p class="text-md font-medium text-slate-500 mt-2">Institut Aminuddin Baki (IAB)</p>
                 </div>
             </div>
-            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl"></div>
+            <!-- Background element -->
+            <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]"></div>
         </footer>
     </main>
 
@@ -302,14 +324,23 @@
             } catch(e) { return { label: "Semakan", class: "bg-slate-100 text-slate-500" }; }
         }
 
+        function getProgramCount(name) {
+            const n = name.toUpperCase();
+            if (n.includes("LEAD")) return liveData.lead.items.length;
+            if (n.includes("COE")) return liveData.coe.items.length;
+            if (n.includes("ASSESSOR")) return liveData.assessor.items.length;
+            if (n.includes("PBD")) return liveData.pbd.items.length;
+            return 0;
+        }
+
         function openOPR(dataIdx) {
             const item = liveData[activeTabKey].items[dataIdx];
             if (!item) return;
             document.getElementById('opr-title-display').innerText = item.name;
             document.getElementById('opr-meta').innerHTML = `<span>TARIKH: ${item.startDate} - ${item.endDate}</span> | <span>LOKASI: ${item.location || 'IAB'}</span> | <span>UNIT: ${item.branch}</span>`;
-            document.getElementById('opr-objective-display').innerText = item.objective || "Tiada maklumat objektif.";
-            document.getElementById('opr-activity-display').innerText = item.activity || "Tiada maklumat aktiviti.";
-            document.getElementById('opr-impact-display').innerText = item.impact || "Tiada maklumat impak.";
+            document.getElementById('opr-objective-display').innerText = item.objective || "Laporan objektif belum dikemas kini.";
+            document.getElementById('opr-activity-display').innerText = item.activity || "Laporan aktiviti belum dikemas kini.";
+            document.getElementById('opr-impact-display').innerText = item.impact || "Laporan impak belum dikemas kini.";
             document.getElementById('opr-footer-date').innerText = "Dijana pada: " + new Date().toLocaleString('ms-MY');
             const mainImg = document.getElementById('opr-main-img');
             const placeholder = document.getElementById('opr-img-placeholder');
@@ -325,13 +356,12 @@
 
         function closeOPR() { document.getElementById('opr-modal').classList.add('hidden'); }
 
-        function getProgramCount(name) {
-            const n = name.toUpperCase();
-            if (n.includes("LEAD")) return liveData.lead.items.length;
-            if (n.includes("COE")) return liveData.coe.items.length;
-            if (n.includes("ASSESSOR")) return liveData.assessor.items.length;
-            if (n.includes("PBD")) return liveData.pbd.items.length;
-            return 0;
+        function getWarrantStatusClasses(baki, totalWaran) {
+            if (totalWaran === 0) return "bg-slate-900 border-slate-700 text-white";
+            const ratio = baki / totalWaran;
+            if (baki < 0 || ratio > 0.8) return "bg-rose-900 border-rose-500 text-white";
+            if (ratio < 0.2) return "bg-emerald-900 border-emerald-500 text-white";
+            return "bg-blue-900 border-blue-500 text-white";
         }
 
         async function fetchAllData() {
@@ -384,9 +414,9 @@
             const items = current.items || [];
             const isAnalisis = activeTabKey === 'analisis';
             
-            document.getElementById('table-subtitle').innerText = isAnalisis ? "Data pegawai meja bagi setiap kategori program." : "Perincian aktiviti dan penjanaan laporan OPR.";
             const mainTable = document.getElementById('main-table');
-            mainTable.className = `w-full text-left ${isAnalisis ? 'min-w-[1000px]' : 'min-w-[1400px]'}`;
+            mainTable.className = `w-full text-left ${isAnalisis ? 'min-w-[800px]' : 'min-w-[1300px]'}`;
+            document.getElementById('table-subtitle').innerText = isAnalisis ? "Data pegawai meja mengikut kategori program." : "Data perincian dan penjanaan laporan OPR.";
 
             const tAlloc = items.reduce((a, b) => a + b.alloc, 0);
             const tSpent = items.reduce((a, b) => a + b.spent, 0);
@@ -399,33 +429,41 @@
             const warrantTotal = isAnalisis && liveData.analisis.warrant ? liveData.analisis.warrant.total : 0;
 
             document.getElementById('kpi-container').innerHTML = `
-                ${isAnalisis ? `<div class="bg-slate-900 p-6 rounded-3xl border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>` : ''}
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Dipohon</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Baki Peruntukan</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Prestasi</p><h3 class="text-xl font-black text-blue-800">${perc}%</h3></div>
-                <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 text-center shadow-sm border-2"><p class="text-indigo-400 text-[10px] font-bold uppercase mb-2 tracking-widest">Laporan OPR</p><h3 class="text-xl font-black text-indigo-700">${isAnalisis ? tOPRReady + ' / ' + tOPRTotal : items.filter(i => (i.objective && i.objective.length > 5)).length + ' / ' + items.length}</h3></div>
+                ${isAnalisis ? `<div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>` : ''}
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Dipohon</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Baki Semasa</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 text-center shadow-sm"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Prestasi</p><h3 class="text-xl font-black text-blue-800">${perc}%</h3></div>
+                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-200 text-center shadow-sm border-2"><p class="text-indigo-500 text-[10px] font-black uppercase mb-2 tracking-widest">Status OPR</p><h3 class="text-xl font-black text-indigo-700">${isAnalisis ? tOPRReady + ' / ' + tOPRTotal : items.filter(i => (i.objective && i.objective.length > 5)).length + ' / ' + items.length}</h3></div>
             `;
 
-            const ceilingSec = document.getElementById('ceiling-section');
-            if (isAnalisis && liveData.analisis.ceiling) {
-                ceilingSec.classList.remove('hidden');
-                const tCeil = liveData.analisis.ceiling.total;
-                document.getElementById('ceiling-total').innerText = formatRM(tCeil);
-                document.getElementById('ceiling-balance').innerText = formatRM(tCeil - tAlloc);
-                document.getElementById('ceiling-balance-card').className = `p-6 rounded-3xl border text-center min-w-[220px] ${(tCeil-tAlloc) < 0 ? 'bg-rose-900' : 'bg-blue-600/30 border-blue-400'}`;
-            } else { ceilingSec.classList.add('hidden'); }
+            const remSummary = document.getElementById('remaining-warrant-summary');
+            if(isAnalisis && liveData.analisis.warrant) {
+                remSummary.classList.remove('hidden');
+                const w = liveData.analisis.warrant;
+                const tOS21Alloc = items.reduce((a, b) => a + b.os21, 0);
+                const tOS29Alloc = items.reduce((a, b) => a + b.os29, 0);
+                const bOS21 = w.os21 - tOS21Alloc;
+                const bOS29 = w.os29 - tOS29Alloc;
+                document.getElementById('rem-os21').innerText = formatRM(bOS21);
+                document.getElementById('rem-os29').innerText = formatRM(bOS29);
+                document.getElementById('rem-total').innerText = formatRM(bOS21 + bOS29);
+                document.getElementById('rem-card-os21').className = `p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all ${getWarrantStatusClasses(bOS21, w.os21)}`;
+                document.getElementById('rem-card-os29').className = `p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center transition-all ${getWarrantStatusClasses(bOS29, w.os29)}`;
+                document.getElementById('rem-card-total').className = `p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center border-2 transition-all ${getWarrantStatusClasses(bOS21+bOS29, w.total)}`;
+            } else { remSummary.classList.add('hidden'); }
 
-            // Table Header Penyelarasan
             document.getElementById('table-header-row').innerHTML = isAnalisis ? `
                 <th class="px-8 py-5">Kategori Program</th>
                 <th class="px-8 py-5 text-left">Pegawai Meja</th>
-                <th class="px-8 py-5 text-left">Pusat/Cawangan</th>
+                <th class="px-8 py-5 text-left text-blue-600">Pusat/Cawangan</th>
             ` : `
                 <th class="px-8 py-5">Program / Aktiviti</th>
                 <th class="px-4 py-5 text-center">Status</th>
                 <th class="px-4 py-5 text-center">Tarikh</th>
-                <th class="px-6 py-5 text-right font-bold">Jumlah Bajet (RM)</th>
+                <th class="px-6 py-5 text-right">OS21</th>
+                <th class="px-6 py-5 text-right">OS29</th>
+                <th class="px-6 py-5 text-right font-bold text-blue-600">Bajet (RM)</th>
                 <th class="px-6 py-5 text-right font-bold text-slate-900">Belanja</th>
                 <th class="px-6 py-5 text-left">Pegawai Meja</th>
                 <th class="px-6 py-5 text-center">Tindakan</th>
@@ -435,9 +473,9 @@
                 if (isAnalisis) {
                     return `
                         <tr class="hover:bg-slate-50 transition-all text-sm">
-                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight">${i.name}</td>
-                            <td class="px-8 py-5 text-left font-bold text-slate-900 uppercase text-[11px] tracking-tight">${i.officer}</td>
-                            <td class="px-8 py-5 text-left font-semibold text-blue-600/80">${i.branch}</td>
+                            <td class="px-8 py-6 font-bold text-slate-700 leading-tight">${i.name}</td>
+                            <td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td>
+                            <td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight">${i.branch}</td>
                         </tr>
                     `;
                 } else {
@@ -445,20 +483,22 @@
                     return `
                         <tr class="hover:bg-slate-50 transition-all text-sm">
                             <td class="px-8 py-5 font-bold text-slate-700 leading-tight">${i.name}</td>
-                            <td class="px-4 py-5 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase ${status.class}">${status.label}</span></td>
+                            <td class="px-4 py-5 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${status.class}">${status.label}</span></td>
                             <td class="px-4 py-5 text-center text-[11px] text-slate-500 font-medium">${i.endDate}</td>
+                            <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os21)}</td>
+                            <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os29)}</td>
                             <td class="px-6 py-5 text-right font-bold text-blue-600/80">${formatRM(i.alloc)}</td>
                             <td class="px-6 py-5 text-right font-bold text-slate-900">${formatRM(i.spent)}</td>
-                            <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase">
-                                ${i.officer}<br><span class="text-blue-500 normal-case font-semibold">${i.branch}</span>
+                            <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase leading-snug">
+                                ${i.officer}<br><span class="text-blue-500 font-semibold normal-case">${i.branch}</span>
                             </td>
                             <td class="px-6 py-5 text-center">
-                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-bold shadow-lg hover:bg-indigo-700 uppercase tracking-widest transition-all">Lihat OPR</button>` : '<span class="text-slate-300 font-bold text-[10px] uppercase">Belum Muat Naik</span>'}
+                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat OPR</button>` : '<span class="text-slate-300 font-bold text-[10px]">Tiada OPR</span>'}
                             </td>
                         </tr>
                     `;
                 }
-            }).join('') : `<tr><td colspan="10" class="px-8 py-10 text-center text-slate-300 italic font-medium">Tiada data yang dijumpai.</td></tr>`;
+            }).join('') : `<tr><td colspan="12" class="px-8 py-10 text-center text-slate-300 italic font-medium">Tiada data yang dijumpai.</td></tr>`;
 
             renderCharts(items);
         }
@@ -472,21 +512,21 @@
             const ctxMain = document.getElementById('mainChart').getContext('2d');
             
             if (isAnalisis) {
-                // Multi-Bar Chart for Analysis (OS21, OS29, Spent)
+                // Reverted to Line Chart as requested
                 mainChart = new Chart(ctxMain, {
-                    type: 'bar',
+                    type: 'line',
                     data: {
                         labels: items.map(i => i.name.substring(0, 15) + "..."),
                         datasets: [
-                            { label: 'OS21', data: items.map(i => i.os21), backgroundColor: '#3b82f6', borderRadius: 4 },
-                            { label: 'OS29', data: items.map(i => i.os29), backgroundColor: '#8b5cf6', borderRadius: 4 },
-                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), backgroundColor: '#1e293b', borderRadius: 4 }
+                            { label: 'OS21', data: items.map(i => i.os21), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
+                            { label: 'OS29', data: items.map(i => i.os29), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 3 },
+                            { label: 'Belanja Sebenar', data: items.map(i => i.spent), borderColor: '#1e293b', backgroundColor: 'rgba(30, 41, 59, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }
                         ]
                     },
                     options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { font: { weight: 'bold', size: 10 } } } },
+                        scales: { y: { beginAtZero: true }, x: { ticks: { font: { weight: 'bold' } } } }
                     }
                 });
 
@@ -505,13 +545,11 @@
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
-
                 document.getElementById('count-pie-legend').innerHTML = countData.map(d => `
-                    <div class="flex justify-between items-center text-[10px] text-indigo-100 font-bold uppercase tracking-tight">
-                        <span>${d.name}</span><span class="bg-blue-400/20 px-2 py-0.5 rounded text-white">${d.count} Program</span>
+                    <div class="flex justify-between items-center text-[10px] text-indigo-100 font-bold uppercase">
+                        <span>${d.name}</span><span class="bg-indigo-400/20 px-2 py-0.5 rounded text-white">${d.count} Aktiviti</span>
                     </div>
                 `).join('');
-
             } else {
                 document.getElementById('count-pie-container').classList.add('hidden');
                 mainChart = new Chart(ctxMain, {
@@ -519,26 +557,25 @@
                     data: {
                         labels: items.map(i => i.name.substring(0, 25) + "..."),
                         datasets: [
-                            { label: 'Peruntukan', data: items.map(i => i.alloc), backgroundColor: '#2563eb', barThickness: 30 },
-                            { label: 'Belanja', data: items.map(i => i.spent), backgroundColor: '#1e293b', barThickness: 30 }
+                            { label: 'Bajet', data: items.map(i => i.alloc), backgroundColor: '#2563eb', barThickness: 30, borderRadius: 5 },
+                            { label: 'Belanja', data: items.map(i => i.spent), backgroundColor: '#1e293b', barThickness: 30, borderRadius: 5 }
                         ]
                     },
                     options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
                 });
             }
 
-            const totalOS21 = items.reduce((a, b) => a + (b.os21 || 0), 0);
-            const totalOS29 = items.reduce((a, b) => a + (b.os29 || 0), 0);
+            const tOS21 = items.reduce((a, b) => a + (b.os21 || 0), 0);
+            const tOS29 = items.reduce((a, b) => a + (b.os29 || 0), 0);
             const ctxPie = document.getElementById('pieChart').getContext('2d');
             pieChart = new Chart(ctxPie, {
                 type: 'doughnut',
-                data: { labels: ['OS21', 'OS29'], datasets: [{ data: [totalOS21, totalOS29], backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
+                data: { labels: ['OS21', 'OS29'], datasets: [{ data: [tOS21, tOS29], backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
             });
-
             document.getElementById('pie-legend').innerHTML = `
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100"><div class="flex items-center gap-2 text-xs font-bold text-slate-500"><div class="w-3 h-3 rounded-full bg-blue-500"></div> OS21</div><span class="text-xs font-black">${formatRM(totalOS21)}</span></div>
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100"><div class="flex items-center gap-2 text-xs font-bold text-slate-500"><div class="w-3 h-3 rounded-full bg-purple-500"></div> OS29</div><span class="text-xs font-black">${formatRM(totalOS29)}</span></div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100"><div class="flex items-center gap-2 text-xs font-bold text-slate-500"><div class="w-3 h-3 rounded-full bg-blue-500"></div> OS21</div><span class="text-xs font-black">${formatRM(tOS21)}</span></div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100"><div class="flex items-center gap-2 text-xs font-bold text-slate-500"><div class="w-3 h-3 rounded-full bg-purple-500"></div> OS29</div><span class="text-xs font-black">${formatRM(tOS29)}</span></div>
             `;
         }
 
@@ -546,7 +583,7 @@
             activeTabKey = key;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.id === 'btn-analisis') { btn.classList.add('btn-analisis-custom'); }
+                if (btn.id !== 'btn-analisis') { btn.classList.replace('text-slate-700', 'text-slate-500'); }
             });
             document.getElementById(`btn-${key}`).classList.add('active');
             updateUI();
