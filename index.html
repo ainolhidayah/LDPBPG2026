@@ -141,19 +141,19 @@
                         <div class="flex items-center gap-3 mb-6"><div class="w-2.5 h-5 bg-slate-300"></div><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest">Galeri Aktiviti</h4></div>
                         <div class="grid grid-cols-4 gap-4">
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-1" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
                                 <img id="opr-extra-1" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-2" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
                                 <img id="opr-extra-2" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-3" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
                                 <img id="opr-extra-3" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-4" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
                                 <img id="opr-extra-4" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                         </div>
@@ -272,7 +272,7 @@
         <div id="activity-gallery-section" class="mb-12 hidden">
             <div class="flex items-center justify-between mb-8 px-4">
                 <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Sorotan Aktiviti Program 2026</h3>
-                <span class="text-xs font-bold text-blue-600 uppercase bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100">Live Gallery</span>
+                <span class="text-[10px] font-bold text-blue-600 uppercase bg-blue-50 px-4 py-2 rounded-full border border-blue-100 tracking-widest shadow-sm">Galeri Semasa</span>
             </div>
             <div id="gallery-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <!-- Gallery populated by JS -->
@@ -344,27 +344,14 @@
         const formatRM = (v) => new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(v || 0);
         const cleanVal = (str) => { if (!str) return 0; let val = str.replace(/[RM,\s]/gi, '').replace(/\((.*)\)/, '-$1'); return parseFloat(val) || 0; };
 
-        // PERBAIKAN: Fungsi baharu untuk mengekstrak ID fail memandangkan uc?export=view dah di-block oleh Google
-        function formatDriveLink(url) {
-            if (!url) return "";
-            
-            let id = "";
+        // PERBAIKAN: Fungsi pengekstrakan ID Google Drive sahaja (Pautan akan dijana di HTML secara Dual-Fallback)
+        function getDriveId(url) {
+            if (!url) return null;
             const matchD = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
             const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
-            
-            if (matchD) {
-                id = matchD[1];
-            } else if (matchId) {
-                id = matchId[1];
-            }
-            
-            // Gunakan thumbnail endpoint - ini satu-satunya kaedah yang paling stabil 
-            // untuk memaparkan imej Google Drive secara terus ke dalam tag <img src="">
-            if (id) {
-                return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-            }
-            
-            return url; // Kembalikan url asal jika bukan format Google Drive
+            if (matchD) return matchD[1];
+            if (matchId) return matchId[1];
+            return null;
         }
 
         function parseCSV(csv) {
@@ -402,9 +389,12 @@
             return 0;
         }
 
-        function openOPR(dataIdx) {
-            const item = liveData[activeTabKey].items[dataIdx];
+        // PERBAIKAN: Fungsi Buka OPR dipanggil berdasarkan NAMA program dari mana-mana tempat
+        window.openOPRByName = function(name) {
+            const allProgramItems = [...liveData.lead.items, ...liveData.coe.items, ...liveData.assessor.items, ...liveData.pbd.items];
+            const item = allProgramItems.find(p => p.name === name);
             if (!item) return;
+
             document.getElementById('opr-title-display').innerText = item.name;
             document.getElementById('opr-meta').innerHTML = `<span>TARIKH: ${item.startDate} - ${item.endDate}</span> | <span>LOKASI: ${item.location || 'IAB'}</span> | <span>UNIT: ${item.branch}</span>`;
             document.getElementById('opr-objective-display').innerText = item.objective || "Laporan belum dikemas kini.";
@@ -412,31 +402,28 @@
             document.getElementById('opr-impact-display').innerText = item.impact || "Laporan belum dikemas kini.";
             document.getElementById('opr-footer-date').innerText = "Dijana pada: " + new Date().toLocaleString('ms-MY');
             
-            const mainImg = document.getElementById('opr-main-img');
-            const placeholder = document.getElementById('opr-img-placeholder');
-            if (item.imgMain && item.imgMain.length > 10) { 
-                mainImg.src = item.imgMain; 
-                mainImg.classList.remove('hidden'); 
-                placeholder.classList.add('hidden'); 
-            } else { 
-                mainImg.src = '';
-                mainImg.classList.add('hidden'); 
-                placeholder.classList.remove('hidden'); 
-            }
-            
-            for(let k=1; k<=4; k++) {
-                const imgEl = document.getElementById(`opr-extra-${k}`);
-                const url = item[`imgEx${k}`];
-                if(url && url.length > 10) { 
-                    imgEl.src = url; 
+            const setupImage = (elId, spanId, url) => {
+                const imgEl = document.getElementById(elId);
+                const spanEl = document.getElementById(spanId);
+                const driveId = getDriveId(url);
+                if (url && url.length > 10) { 
+                    imgEl.src = driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : url;
+                    // Dual-fallback: Jika uc?export gagal, cuba thumbnail Google Drive, jika gagal juga, letak imej rosak
+                    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : 'https://placehold.co/400x400/blue/white?text=Imej+Rosak'; };
                     imgEl.classList.remove('hidden'); 
+                    if(spanEl) spanEl.classList.add('hidden'); 
                 } else { 
                     imgEl.src = '';
                     imgEl.classList.add('hidden'); 
+                    if(spanEl) spanEl.classList.remove('hidden'); 
                 }
-            }
+            };
+
+            setupImage('opr-main-img', 'opr-img-placeholder', item.imgMain);
+            for(let k=1; k<=4; k++) setupImage(`opr-extra-${k}`, `opr-extra-span-${k}`, item[`imgEx${k}`]);
+            
             document.getElementById('opr-modal').classList.remove('hidden');
-        }
+        };
 
         function closeOPR() { document.getElementById('opr-modal').classList.add('hidden'); }
 
@@ -483,11 +470,11 @@
                                     officer: rows[i][16], branch: rows[i][17],
                                     // FIXED INDICES: S(18), T(19), U(20), V(21), W(22), X(23), Y(24), Z(25)
                                     objective: rows[i][18], activity: rows[i][19], impact: rows[i][20],
-                                    imgMain: formatDriveLink(rows[i][21]), 
-                                    imgEx1: formatDriveLink(rows[i][22]), 
-                                    imgEx2: formatDriveLink(rows[i][23]), 
-                                    imgEx3: formatDriveLink(rows[i][24]), 
-                                    imgEx4: formatDriveLink(rows[i][25])
+                                    imgMain: (rows[i][21] || "").trim(), 
+                                    imgEx1: (rows[i][22] || "").trim(), 
+                                    imgEx2: (rows[i][23] || "").trim(), 
+                                    imgEx3: (rows[i][24] || "").trim(), 
+                                    imgEx4: (rows[i][25] || "").trim()
                                 });
                             }
                         }
@@ -539,12 +526,19 @@
             if (isAnalisis) {
                 gallerySec.classList.remove('hidden');
                 const images = allProgramItems.filter(p => p.imgMain && p.imgMain.length > 10).map(p => ({ url: p.imgMain, name: p.name }));
-                document.getElementById('gallery-container').innerHTML = images.length ? images.map(img => `
-                    <div class="gallery-item relative bg-slate-200 rounded-2xl overflow-hidden aspect-square shadow-sm" onclick="alert('Program: ${img.name}')">
-                        <img src="${img.url}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400/blue/white?text=Imej+Rosak'">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3"><p class="text-[9px] font-bold text-white uppercase leading-tight">${img.name}</p></div>
+                document.getElementById('gallery-container').innerHTML = images.length ? images.map(img => {
+                    const driveId = getDriveId(img.url);
+                    const pSrc = driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : img.url;
+                    const fSrc = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : 'https://placehold.co/400x400/blue/white?text=Imej+Rosak';
+                    return `
+                    <div class="gallery-item group relative bg-slate-200 rounded-2xl overflow-hidden aspect-square shadow-sm cursor-pointer" onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" title="Klik untuk lihat laporan">
+                        <img src="${pSrc}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${fSrc}'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-4 transition-all duration-300 group-hover:from-blue-900/90 group-hover:via-blue-800/40">
+                            <p class="text-[10px] font-black text-white uppercase leading-tight drop-shadow-md">${img.name}</p>
+                            <p class="text-[8px] font-bold text-blue-300 uppercase mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md">Klik untuk buka OPR</p>
+                        </div>
                     </div>
-                `).join('') : '<div class="col-span-full py-12 text-center text-slate-300 italic">Tiada imej aktiviti dimuat naik lagi.</div>';
+                `}).join('') : '<div class="col-span-full py-12 text-center text-slate-300 italic">Tiada imej aktiviti dimuat naik lagi.</div>';
             } else { gallerySec.classList.add('hidden'); }
 
             document.getElementById('table-header-row').innerHTML = isAnalisis ? `
@@ -567,7 +561,7 @@
                             <td class="px-6 py-5 text-right font-bold text-blue-600/80">${formatRM(i.alloc)}</td><td class="px-6 py-5 text-right font-bold text-slate-900 border-l border-slate-50">${formatRM(i.spent)}</td>
                             <td class="px-6 py-5 text-left text-[10px] font-bold text-slate-900 uppercase leading-tight border-l border-slate-50">${i.officer}<br><span class="text-blue-500 normal-case font-medium italic">${i.branch}</span></td>
                             <td class="px-6 py-5 text-center">
-                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPR(${idx})" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat</button>` : '<span class="text-slate-300 font-bold text-[10px]">Tiada</span>'}
+                                ${i.objective && i.objective.length > 5 ? `<button onclick="openOPRByName('${i.name.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg hover:bg-indigo-700 uppercase transition-all">Lihat</button>` : '<span class="text-slate-300 font-bold text-[10px]">Tiada</span>'}
                             </td>
                         </tr>
                     `;
