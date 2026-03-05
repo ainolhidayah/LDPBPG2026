@@ -127,7 +127,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p class="text-xs font-bold uppercase tracking-[0.3em] italic">Imej Aktiviti Utama</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.3em] italic">Tiada Pautan Imej</p>
+                        <p class="text-[10px] text-slate-400 normal-case tracking-normal mt-2 text-center max-w-[280px]">Sila pastikan anda meletakkan <b>URL / Pautan Google Drive</b> di dalam sel Google Sheet, bukan memasukkan (insert) gambar secara terus dalam sel.</p>
                     </div>
                 </div>
 
@@ -141,19 +142,19 @@
                         <div class="flex items-center gap-3 mb-6"><div class="w-2.5 h-5 bg-slate-300"></div><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest">Galeri Aktiviti</h4></div>
                         <div class="grid grid-cols-4 gap-4">
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span id="opr-extra-span-1" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-1" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Pautan</span>
                                 <img id="opr-extra-1" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span id="opr-extra-span-2" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-2" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Pautan</span>
                                 <img id="opr-extra-2" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span id="opr-extra-span-3" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-3" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Pautan</span>
                                 <img id="opr-extra-3" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                             <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                <span id="opr-extra-span-4" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute">Tiada Imej</span>
+                                <span id="opr-extra-span-4" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Pautan</span>
                                 <img id="opr-extra-4" src="" class="w-full h-full object-cover hidden relative z-10">
                             </div>
                         </div>
@@ -344,6 +345,11 @@
         const formatRM = (v) => new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(v || 0);
         const cleanVal = (str) => { if (!str) return 0; let val = str.replace(/[RM,\s]/gi, '').replace(/\((.*)\)/, '-$1'); return parseFloat(val) || 0; };
 
+        // Fungsi semak adakah teks itu pautan (URL) yang sah
+        const isValidUrl = (string) => {
+            try { new URL(string); return true; } catch (_) { return false; }
+        };
+
         // PERBAIKAN: Fungsi pengekstrakan ID Google Drive sahaja (Pautan akan dijana di HTML secara Dual-Fallback)
         function getDriveId(url) {
             if (!url) return null;
@@ -389,7 +395,7 @@
             return 0;
         }
 
-        // PERBAIKAN: Fungsi Buka OPR dipanggil berdasarkan NAMA program dari mana-mana tempat
+        // PERBAIKAN: Fungsi Buka OPR & Sistem Auto-Generate Gambar jika kosong
         window.openOPRByName = function(name) {
             const allProgramItems = [...liveData.lead.items, ...liveData.coe.items, ...liveData.assessor.items, ...liveData.pbd.items];
             const item = allProgramItems.find(p => p.name === name);
@@ -402,25 +408,39 @@
             document.getElementById('opr-impact-display').innerText = item.impact || "Laporan belum dikemas kini.";
             document.getElementById('opr-footer-date').innerText = "Dijana pada: " + new Date().toLocaleString('ms-MY');
             
-            const setupImage = (elId, spanId, url) => {
+            const setupImage = (elId, spanId, url, pName, isMain) => {
                 const imgEl = document.getElementById(elId);
                 const spanEl = document.getElementById(spanId);
                 const driveId = getDriveId(url);
-                if (url && url.length > 10) { 
+                
+                // Semak jika pengguna memasukkan pautan yang sah, bukan sekadar ayat biasa
+                let hasValidImage = url && url.length > 5 && isValidUrl(url);
+
+                if (hasValidImage) { 
                     imgEl.src = driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : url;
-                    // Dual-fallback: Jika uc?export gagal, cuba thumbnail Google Drive, jika gagal juga, letak imej rosak
-                    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : 'https://placehold.co/400x400/blue/white?text=Imej+Rosak'; };
+                    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=random&color=fff&size=512`; };
                     imgEl.classList.remove('hidden'); 
                     if(spanEl) spanEl.classList.add('hidden'); 
                 } else { 
-                    imgEl.src = '';
-                    imgEl.classList.add('hidden'); 
-                    if(spanEl) spanEl.classList.remove('hidden'); 
+                    if (isMain) {
+                        // AUTO-GENERATE: Jika tiada pautan gambar, buat gambar automatik guna nama program
+                        imgEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=random&color=fff&size=512`;
+                        imgEl.classList.remove('hidden');
+                        if(spanEl) spanEl.classList.add('hidden'); 
+                    } else {
+                        imgEl.src = '';
+                        imgEl.classList.add('hidden'); 
+                        if(spanEl) {
+                            spanEl.classList.remove('hidden'); 
+                            // Beritahu pengguna jika mereka tertulis teks biasa di dalam ruangan URL gambar
+                            spanEl.innerText = url && url.length > 0 ? "Bukan Pautan" : "Tiada Imej";
+                        }
+                    }
                 }
             };
 
-            setupImage('opr-main-img', 'opr-img-placeholder', item.imgMain);
-            for(let k=1; k<=4; k++) setupImage(`opr-extra-${k}`, `opr-extra-span-${k}`, item[`imgEx${k}`]);
+            setupImage('opr-main-img', 'opr-img-placeholder', item.imgMain, item.name, true);
+            for(let k=1; k<=4; k++) setupImage(`opr-extra-${k}`, `opr-extra-span-${k}`, item[`imgEx${k}`], item.name, false);
             
             document.getElementById('opr-modal').classList.remove('hidden');
         };
@@ -525,20 +545,24 @@
             const gallerySec = document.getElementById('activity-gallery-section');
             if (isAnalisis) {
                 gallerySec.classList.remove('hidden');
-                const images = allProgramItems.filter(p => p.imgMain && p.imgMain.length > 10).map(p => ({ url: p.imgMain, name: p.name }));
-                document.getElementById('gallery-container').innerHTML = images.length ? images.map(img => {
-                    const driveId = getDriveId(img.url);
-                    const pSrc = driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : img.url;
-                    const fSrc = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : 'https://placehold.co/400x400/blue/white?text=Imej+Rosak';
+                // Paparkan KESEMUA program dalam galeri. Jana imej cantik automatik jika tiada gambar diselitkan.
+                document.getElementById('gallery-container').innerHTML = allProgramItems.length ? allProgramItems.map(img => {
+                    const driveId = getDriveId(img.imgMain);
+                    const hasValidImage = img.imgMain && img.imgMain.length > 5 && isValidUrl(img.imgMain);
+                    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(img.name)}&background=random&color=fff&size=400`;
+                    
+                    const pSrc = hasValidImage ? (driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : img.imgMain) : fallbackUrl;
+                    const fSrc = hasValidImage && driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : fallbackUrl;
+                    
                     return `
-                    <div class="gallery-item group relative bg-slate-200 rounded-2xl overflow-hidden aspect-square shadow-sm cursor-pointer" onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" title="Klik untuk lihat laporan">
+                    <div class="gallery-item group relative bg-slate-200 rounded-2xl overflow-hidden aspect-square shadow-sm cursor-pointer border border-slate-200" onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" title="Klik untuk lihat laporan">
                         <img src="${pSrc}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${fSrc}'">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-4 transition-all duration-300 group-hover:from-blue-900/90 group-hover:via-blue-800/40">
                             <p class="text-[10px] font-black text-white uppercase leading-tight drop-shadow-md">${img.name}</p>
                             <p class="text-[8px] font-bold text-blue-300 uppercase mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md">Klik untuk buka OPR</p>
                         </div>
                     </div>
-                `}).join('') : '<div class="col-span-full py-12 text-center text-slate-300 italic">Tiada imej aktiviti dimuat naik lagi.</div>';
+                `}).join('') : '<div class="col-span-full py-12 text-center text-slate-300 italic">Tiada data program untuk dipaparkan.</div>';
             } else { gallerySec.classList.add('hidden'); }
 
             document.getElementById('table-header-row').innerHTML = isAnalisis ? `
