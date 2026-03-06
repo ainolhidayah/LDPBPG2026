@@ -98,17 +98,48 @@
                 overflow: visible !important;
             }
             
-            /* --- KEMAS KINI: Kekalkan OPR dalam Mod Gelap asal untuk PDF --- */
+            /* --- KEMAS KINI: Baiki pepijat "Teks Ghaib" dalam PDF akibat fungsi Blur --- */
             /* Sembunyikan elemen hiasan bulat (blur) sahaja supaya tak nampak kotor */
             body.print-opr-mode .blur-\[80px\],
             body.print-opr-mode .blur-\[60px\] {
                 display: none !important;
             }
+
+            /* PUNCA UTAMA: Fungsi 'backdrop-blur' menyebabkan browser gagal render teks ke PDF. Mesti dibuang masa print. */
+            body.print-opr-mode .backdrop-blur-sm,
+            body.print-opr-mode .backdrop-blur-md {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                background-color: #1e293b !important; /* Tukar ke warna solid gelap */
+            }
             
-            /* Memastikan teks dalam banner kekal cerah (putih/warna-warni) semasa PDF */
+            /* Paksa kotak utama OPR untuk guna warna solid gelap (Gradient sering gagal dicetak oleh browser) */
+            body.print-opr-mode #opr-main-infographic {
+                background: #0f172a !important; 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Memastikan teks dalam banner kekal terang (tidak ditukar hitam secara automatik oleh enjin PDF) */
             body.print-opr-mode #opr-main-infographic * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            body.print-opr-mode #opr-info-title,
+            body.print-opr-mode #opr-info-alloc {
+                color: #ffffff !important;
+            }
+            body.print-opr-mode #opr-info-spent {
+                color: #34d399 !important; /* warna hijau zamrud */
+            }
+            body.print-opr-mode #opr-info-pax {
+                color: #c084fc !important; /* warna ungu */
+            }
+            body.print-opr-mode #opr-info-dates {
+                color: #93c5fd !important; /* warna biru cair */
+            }
+            body.print-opr-mode .text-slate-400 {
+                color: #94a3b8 !important; 
             }
             /* ---------------------------------------------------------------------- */
             
