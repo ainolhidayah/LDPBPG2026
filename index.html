@@ -8,6 +8,8 @@
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- TAMBAHAN BARU: Library untuk fungsi Auto-Jana Infografik kepada Imej (PNG) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
@@ -159,6 +161,17 @@
                 page-break-inside: avoid;
             }
         }
+
+        /* TAMBAHAN BARU: Kelas khas semasa proses tangkapan imej (PNG) sedang berjalan */
+        body.capturing-png .backdrop-blur-sm,
+        body.capturing-png .backdrop-blur-md {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background-color: #1e293b !important; /* Paksa warna solid gelap supaya teks putih tidak hilang dalam PNG */
+        }
+        body.capturing-png #opr-main-infographic {
+            background: #0f172a !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-12 font-medium">
@@ -175,9 +188,16 @@
     <div id="opr-modal" class="fixed inset-0 z-[150] hidden overflow-y-auto bg-slate-900/95 backdrop-blur-md p-4 md:p-8">
         <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 relative" id="opr-modal-content">
             <div class="no-print absolute top-6 right-6 flex gap-3 z-50">
+                <!-- TAMBAHAN BARU: Butang Muat Turun Infografik (PNG) -->
+                <button id="btn-download-png" onclick="downloadPNG()" class="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 flex items-center gap-2 px-5 transition-all">
+                    <svg id="icon-download" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    <svg id="icon-loading" class="animate-spin hidden w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-xs font-bold uppercase tracking-wider" id="text-download">Muat Turun PNG</span>
+                </button>
+                
                 <button onclick="printOPR()" class="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 flex items-center gap-2 px-5 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                    <span class="text-xs font-bold uppercase tracking-wider">Cetak OPR</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Cetak PDF</span>
                 </button>
                 <button onclick="closeOPR()" class="bg-rose-500 text-white p-3 rounded-full shadow-lg hover:bg-rose-600 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -576,6 +596,56 @@
             setTimeout(() => {
                 document.body.classList.remove('print-opr-mode');
             }, 500);
+        }
+
+        // TAMBAHAN BARU: Fungsi Auto-Jana Infografik PNG (Definisi Tinggi)
+        async function downloadPNG() {
+            const printableArea = document.getElementById('printable-area');
+            const btn = document.getElementById('btn-download-png');
+            const iconDownload = document.getElementById('icon-download');
+            const iconLoading = document.getElementById('icon-loading');
+            const textDownload = document.getElementById('text-download');
+            
+            try {
+                // UI Loading Effect (Supaya pengguna tahu sistem sedang memproses)
+                btn.disabled = true;
+                iconDownload.classList.add('hidden');
+                iconLoading.classList.remove('hidden');
+                textDownload.innerText = 'Menjana Infografik...';
+                
+                // Tambah class untuk buang 'blur' sementara waktu supaya teks tidak ghaib dalam PNG
+                document.body.classList.add('capturing-png');
+                
+                // Mulakan rakaman skrin elemen OPR menggunakan html2canvas
+                const canvas = await html2canvas(printableArea, {
+                    scale: 2, // Resolusi 2x ganda (High Definition)
+                    useCORS: true, // Benarkan imej luar jika ada
+                    backgroundColor: '#ffffff', // Latar belakang wajib putih
+                    logging: false // Sembunyikan log dari console
+                });
+                
+                // Tukar canvas menjadi fail Imej PNG
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Cipta pautan muat turun rahsia dan tekan secara automatik
+                const link = document.createElement('a');
+                let programTitle = document.getElementById('opr-info-title').innerText || 'Program';
+                programTitle = programTitle.substring(0, 30).replace(/[^a-zA-Z0-9 ]/g, ""); // Bersihkan nama fail
+                link.download = `Infografik_LDP_${programTitle}.png`;
+                link.href = imgData;
+                link.click();
+                
+            } catch (error) {
+                console.error('Ralat ketika menjana PNG:', error);
+                alert('Maaf, sistem gagal menjana fail infografik. Sila cuba cetak (PDF) sebagai alternatif.');
+            } finally {
+                // Kembalikan antaramuka seperti sedia kala
+                document.body.classList.remove('capturing-png');
+                btn.disabled = false;
+                iconDownload.classList.remove('hidden');
+                iconLoading.classList.add('hidden');
+                textDownload.innerText = 'Muat Turun PNG';
+            }
         }
 
         async function fetchAllData() {
