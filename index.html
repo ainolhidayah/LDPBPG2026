@@ -69,32 +69,56 @@
                 grid-template-columns: repeat(2, 1fr) !important; /* Paksa jadi 2 lajur supaya kemas */
                 gap: 15px !important;
             }
+            
+            /* Tukar kotak kepada warna terang berbingkai gelap */
             body:not(.print-opr-mode) .gallery-item {
-                border: 2px solid #cbd5e1 !important;
-                background: #f8fafc !important;
+                border: 2px solid #334155 !important; /* Bingkai gelap */
+                background: #ffffff !important; /* Latar terang */
+                padding: 1.5rem !important;
                 min-height: auto !important;
-                page-break-inside: avoid !important; /* Elak kotak terpotong dua muka surat */
+                height: auto !important;
+                page-break-inside: avoid !important;
+                border-radius: 1rem !important;
+                box-shadow: none !important;
             }
+            
             /* Sembunyikan lapisan latar belakang imej/kecerunan gelap */
             body:not(.print-opr-mode) .gallery-item > div:first-child {
                 display: none !important; 
             }
-            /* Jadikan lapisan teks sebagai lapisan biasa (bukan absolute) */
-            body:not(.print-opr-mode) .gallery-item > div:nth-child(2) {
+            
+            /* Jadikan lapisan teks sebagai lapisan biasa */
+            body:not(.print-opr-mode) .gallery-item > div:last-child {
                 position: relative !important; 
                 background: none !important;
-                padding: 1.5rem !important;
+                padding: 0 !important;
+                display: block !important;
             }
-            /* Paksa semua tulisan menjadi warna gelap dan sentiasa jelas tanpa perlu 'hover' */
+            
+            /* Paksa semua tulisan menjadi warna gelap dan sentiasa jelas */
             body:not(.print-opr-mode) .gallery-item * {
-                color: #0f172a !important; 
+                color: #0f172a !important; /* Tulisan warna gelap */
                 text-shadow: none !important;
-                opacity: 1 !important; 
+                opacity: 1 !important; /* Paksa maklumat kewangan muncul */
                 transform: none !important;
+                visibility: visible !important;
             }
+            
             /* Tukar warna garisan pemisah menjadi lebih gelap */
             body:not(.print-opr-mode) .gallery-item .border-white\/20 {
                 border-color: #cbd5e1 !important;
+            }
+            
+            /* Gayakan lencana (badge) status supaya lebih kemas bila dicetak */
+            body:not(.print-opr-mode) .gallery-item span {
+                background: #f1f5f9 !important;
+                border: 1px solid #94a3b8 !important;
+                color: #334155 !important;
+            }
+            
+            /* Sembunyikan ikon bulat yang tak perlu */
+            body:not(.print-opr-mode) .gallery-item svg {
+                display: none !important;
             }
             /* ------------------------------------------------------------------------- */
             
