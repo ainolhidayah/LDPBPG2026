@@ -585,6 +585,32 @@
             document.getElementById('opr-info-spent').innerText = formatRM(item.spent);
             document.getElementById('opr-info-pax').innerText = `${item.participants || 0} Orang`;
             
+            // KEMAS KINI: Tambah 'crossOrigin' untuk membenarkan tangkapan imej (screenshot)
+            const setupExtraImage = (elId, spanId, url) => {
+                const imgEl = document.getElementById(elId);
+                const spanEl = document.getElementById(spanId);
+                const driveId = getDriveId(url);
+                let hasValidImage = url && url.length > 5 && isValidUrl(url);
+
+                imgEl.setAttribute('crossOrigin', 'anonymous'); // Baris penting untuk elak ralat html2canvas
+
+                if (hasValidImage) { 
+                    imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w800` : url;
+                    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = ''; imgEl.classList.add('hidden'); if(spanEl) { spanEl.classList.remove('hidden'); spanEl.innerText = "Imej Disekat"; }};
+                    imgEl.classList.remove('hidden'); 
+                    if(spanEl) spanEl.classList.add('hidden'); 
+                } else { 
+                    imgEl.src = '';
+                    imgEl.classList.add('hidden'); 
+                    if(spanEl) {
+                        spanEl.classList.remove('hidden'); 
+                        spanEl.innerText = url && url.length > 0 ? "Bukan Pautan" : "Tiada Imej";
+                    }
+                }
+            };
+
+            for(let k=1; k<=4; k++) setupExtraImage(`opr-extra-${k}`, `opr-extra-span-${k}`, item[`imgEx${k}`]);
+
             document.getElementById('opr-modal').classList.remove('hidden');
         };
 
@@ -620,6 +646,7 @@
                 const canvas = await html2canvas(printableArea, {
                     scale: 2, // Resolusi 2x ganda (High Definition)
                     useCORS: true, // Benarkan imej luar jika ada
+                    allowTaint: false, // Elak ralat jika ada imej yang dikunci ketat
                     backgroundColor: '#ffffff', // Latar belakang wajib putih
                     logging: false // Sembunyikan log dari console
                 });
@@ -637,7 +664,7 @@
                 
             } catch (error) {
                 console.error('Ralat ketika menjana PNG:', error);
-                alert('Maaf, sistem gagal menjana fail infografik. Sila cuba cetak (PDF) sebagai alternatif.');
+                alert('Maaf, pelayar web anda menyekat (block) proses kerana isu keselamatan pautan gambar Google Drive. Sila gunakan fungsi "Cetak PDF" sebagai alternatif.');
             } finally {
                 // Kembalikan antaramuka seperti sedia kala
                 document.body.classList.remove('capturing-png');
