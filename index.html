@@ -98,6 +98,20 @@
                 overflow: visible !important;
             }
             
+            /* --- KEMAS KINI: Kekalkan OPR dalam Mod Gelap asal untuk PDF --- */
+            /* Sembunyikan elemen hiasan bulat (blur) sahaja supaya tak nampak kotor */
+            body.print-opr-mode .blur-\[80px\],
+            body.print-opr-mode .blur-\[60px\] {
+                display: none !important;
+            }
+            
+            /* Memastikan teks dalam banner kekal cerah (putih/warna-warni) semasa PDF */
+            body.print-opr-mode #opr-main-infographic * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            /* ---------------------------------------------------------------------- */
+            
             /* Susun atur Grid OPR dibaiki supaya turun ke bawah jika diprint */
             body.print-opr-mode .print-stack {
                 display: block !important;
