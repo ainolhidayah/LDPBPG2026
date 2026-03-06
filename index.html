@@ -63,62 +63,17 @@
             /* MODE 1: Cetak Dashboard Utama */
             body:not(.print-opr-mode) #opr-modal { display: none !important; }
             
-            /* --- TAMBAHAN BARU: Membaiki teks hilang dalam kad Infografik semasa cetak --- */
+            /* Susun atur Grid Galeri yang bersih untuk cetakan */
             body:not(.print-opr-mode) #gallery-container {
                 display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important; /* Paksa jadi 2 lajur supaya kemas */
+                grid-template-columns: repeat(2, 1fr) !important; /* Paksa 2 lajur */
                 gap: 15px !important;
             }
             
-            /* Tukar kotak kepada warna terang berbingkai gelap */
             body:not(.print-opr-mode) .gallery-item {
-                border: 2px solid #334155 !important; /* Bingkai gelap */
-                background: #ffffff !important; /* Latar terang */
-                padding: 1.5rem !important;
-                min-height: auto !important;
-                height: auto !important;
                 page-break-inside: avoid !important;
-                border-radius: 1rem !important;
+                border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
-            }
-            
-            /* Sembunyikan lapisan latar belakang imej/kecerunan gelap */
-            body:not(.print-opr-mode) .gallery-item > div:first-child {
-                display: none !important; 
-            }
-            
-            /* Jadikan lapisan teks sebagai lapisan biasa */
-            body:not(.print-opr-mode) .gallery-item > div:last-child {
-                position: relative !important; 
-                background: none !important;
-                padding: 0 !important;
-                display: block !important;
-            }
-            
-            /* Paksa semua tulisan menjadi warna gelap dan sentiasa jelas */
-            body:not(.print-opr-mode) .gallery-item * {
-                color: #0f172a !important; /* Tulisan warna gelap */
-                text-shadow: none !important;
-                opacity: 1 !important; /* Paksa maklumat kewangan muncul */
-                transform: none !important;
-                visibility: visible !important;
-            }
-            
-            /* Tukar warna garisan pemisah menjadi lebih gelap */
-            body:not(.print-opr-mode) .gallery-item .border-white\/20 {
-                border-color: #cbd5e1 !important;
-            }
-            
-            /* Gayakan lencana (badge) status supaya lebih kemas bila dicetak */
-            body:not(.print-opr-mode) .gallery-item span {
-                background: #f1f5f9 !important;
-                border: 1px solid #94a3b8 !important;
-                color: #334155 !important;
-            }
-            
-            /* Sembunyikan ikon bulat yang tak perlu */
-            body:not(.print-opr-mode) .gallery-item svg {
-                display: none !important;
             }
             /* ------------------------------------------------------------------------- */
             
@@ -397,12 +352,12 @@
             <div class="flex items-center justify-between mb-8 px-4">
                 <div>
                     <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Sorotan Aktiviti Program 2026</h3>
-                    <p class="text-sm font-medium text-slate-500 mt-1">Infografik Pintar Gabungan Semua Program</p>
+                    <p class="text-sm font-medium text-slate-500 mt-1">Maklumat Perbelanjaan & Prestasi Semasa</p>
                 </div>
-                <span class="text-[10px] font-bold text-white uppercase bg-blue-600 px-5 py-2 rounded-full border border-blue-700 tracking-widest shadow-md">Galeri Infografik</span>
+                <span class="text-[10px] font-bold text-white uppercase bg-blue-600 px-5 py-2 rounded-full border border-blue-700 tracking-widest shadow-md">Galeri Program</span>
             </div>
             
-            <!-- Grid Infografik -->
+            <!-- Grid Infografik (Rekaan Baru - Tiada Flip/Hover, Mesra Cetak) -->
             <div id="gallery-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Infographics populated by JS -->
             </div>
@@ -473,12 +428,10 @@
         const formatRM = (v) => new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(v || 0);
         const cleanVal = (str) => { if (!str) return 0; let val = str.replace(/[RM,\s]/gi, '').replace(/\((.*)\)/, '-$1'); return parseFloat(val) || 0; };
 
-        // Fungsi semak adakah teks itu pautan (URL) yang sah
         const isValidUrl = (string) => {
             try { new URL(string); return true; } catch (_) { return false; }
         };
 
-        // Fungsi pemecah teks (wrap) bagi tulisan pada Label Graf supaya tidak terpotong
         const wrapLabelText = (text, maxCharPerLine = 20) => {
             if (!text) return "";
             const words = text.split(' ');
@@ -548,18 +501,15 @@
             document.getElementById('opr-title-display').innerText = item.name;
             document.getElementById('opr-meta').innerHTML = `<span>TARIKH: ${item.startDate} - ${item.endDate}</span> | <span>LOKASI: ${item.location || 'IAB'}</span> | <span>UNIT: ${item.branch}</span>`;
             
-            // Populasikan Teks (Objektif, Aktiviti, Impak) di dalam Kad Baru
             document.getElementById('opr-objective-display').innerText = item.objective || "Maklumat belum dikemas kini.";
             document.getElementById('opr-activity-display').innerText = item.activity || "Maklumat belum dikemas kini.";
             document.getElementById('opr-impact-display').innerText = item.impact || "Maklumat belum dikemas kini.";
             document.getElementById('opr-footer-date').innerText = "Dijana pada: " + new Date().toLocaleString('ms-MY');
             
-            // Populasikan Banner Infografik Utama
             const status = getOPRStatus(item.endDate, item.objective);
             const stLabel = document.getElementById('opr-info-status');
             stLabel.innerText = status.label;
             
-            // Warnakan badge status secara dinamik
             stLabel.style.color = status.label.includes('Tempoh') ? '#60a5fa' : (status.label === 'Tersedia' ? '#34d399' : '#f87171');
             stLabel.style.borderColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.4)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(248, 113, 113, 0.4)');
             stLabel.style.backgroundColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.15)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)');
@@ -672,7 +622,7 @@
             if (isAnalisis) {
                 gallerySec.classList.remove('hidden');
                 
-                // JANA KAD INFOGRAFIK UNTUK SEMUA PROGRAM DI GALERI UTAMA
+                // JANA KAD INFOGRAFIK (REKAAN STATIK, MESRA CETAK, ADA BUTANG LIHAT OPR)
                 document.getElementById('gallery-container').innerHTML = allProgramItems.length ? allProgramItems.map(img => {
                     const driveId = getDriveId(img.imgMain);
                     const hasValidImage = img.imgMain && img.imgMain.length > 5 && isValidUrl(img.imgMain);
@@ -683,39 +633,40 @@
                     const status = getOPRStatus(img.endDate, img.objective);
                     const perbelanjaan = img.alloc > 0 ? ((img.spent / img.alloc) * 100).toFixed(0) : 0;
                     
-                    // Kalau ada gambar, guna gambar. Kalau tiada, guna Kecerunan Warna Biru Gelap
                     let bgImageStyle = pSrc ? `background-image: url('${pSrc}'); background-size: cover; background-position: center;` : `background: linear-gradient(135deg, #1e293b, #0f172a);`;
 
                     return `
-                    <div class="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-slate-200 min-h-[220px]" onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" title="Klik untuk lihat laporan OPR">
-                        <!-- Background Image or Solid -->
-                        <div class="absolute inset-0 transition-transform duration-700 group-hover:scale-110" style="${bgImageStyle}" onerror="this.style.backgroundImage='none'; this.style.background='linear-gradient(135deg, #1e293b, #0f172a)'"></div>
+                    <div class="gallery-item bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl border border-slate-200 flex flex-col h-full transition-all">
+                        <!-- Top Banner (Image/Gradient) -->
+                        <div class="h-28 relative flex-shrink-0 border-b border-slate-100" style="${bgImageStyle}" onerror="this.style.backgroundImage='none'; this.style.background='linear-gradient(135deg, #1e293b, #0f172a)'">
+                            <div class="absolute inset-0 bg-slate-900/30"></div>
+                            <div class="absolute top-4 left-4">
+                                <span class="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">${status.label}</span>
+                            </div>
+                        </div>
                         
-                        <!-- Overlay Gradient -->
-                        <div class="absolute inset-0 bg-gradient-to-t ${pSrc ? 'from-slate-900/95 via-slate-900/70 to-slate-900/20' : 'from-slate-900/80 to-transparent'} p-6 flex flex-col justify-between transition-all duration-300 group-hover:from-blue-900/95 group-hover:via-blue-900/80">
-                            
-                            <!-- Top Section -->
-                            <div class="flex justify-between items-start">
-                                <span class="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[9px] font-black uppercase tracking-widest rounded-full">${status.label}</span>
-                                <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                </div>
-                            </div>
-
-                            <!-- Bottom Section (Infographic Stats) -->
+                        <!-- Main Content (White background, Dark text - Sangat Terang Untuk Cetakan) -->
+                        <div class="p-6 flex flex-col flex-grow justify-between bg-white">
                             <div>
-                                <h4 class="text-white font-black text-lg leading-tight drop-shadow-md line-clamp-2 mb-4">${img.name}</h4>
-                                <div class="grid grid-cols-2 gap-3 border-t border-white/20 pt-4 opacity-80 group-hover:opacity-100 transition-opacity">
-                                    <div>
-                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest mb-0.5 font-bold">Waran / Bajet</p>
-                                        <p class="text-sm font-black text-white">${formatRM(img.alloc)}</p>
+                                <h4 class="text-slate-900 font-black text-[15px] leading-snug mb-5 break-words line-clamp-3" title="${img.name}">${img.name}</h4>
+                                
+                                <div class="grid grid-cols-2 gap-3 mb-6">
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                        <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Waran / Bajet</p>
+                                        <p class="text-[13px] font-black text-blue-600">${formatRM(img.alloc)}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-[9px] text-emerald-300 uppercase tracking-widest mb-0.5 font-bold">Belanja (${perbelanjaan}%)</p>
-                                        <p class="text-sm font-black text-emerald-400">${formatRM(img.spent)}</p>
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                        <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Belanja (${perbelanjaan}%)</p>
+                                        <p class="text-[13px] font-black text-emerald-600">${formatRM(img.spent)}</p>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Button (Hilang masa cetak kerana no-print) -->
+                            <button onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-[11px] font-bold transition-colors no-print flex justify-center items-center gap-2 mt-auto shadow-sm">
+                                Lihat Laporan OPR
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </button>
                         </div>
                     </div>
                     `;
@@ -761,7 +712,6 @@
             const isAnalisis = activeTabKey === 'analisis';
             const ctxMain = document.getElementById('mainChart').getContext('2d');
             
-            // Format label graf supaya nama terbalut (wrap) dan dibaca penuh
             const chartLabels = items.map(i => wrapLabelText(i.name, 20));
             
             if (isAnalisis) {
@@ -778,7 +728,6 @@
                     options: { responsive: true, maintainAspectRatio: false }
                 });
 
-                // PERFORMANCE GAUGE
                 const gaugePerc = warrantTotal > 0 ? (totalSpent / warrantTotal * 100).toFixed(1) : 0;
                 const gaugeColor = gaugePerc > 90 ? '#e11d48' : (gaugePerc > 70 ? '#f59e0b' : '#10b981');
                 document.getElementById('gauge-value').innerHTML = `<span class="text-3xl font-black" style="color: ${gaugeColor}">${gaugePerc}%</span>`;
