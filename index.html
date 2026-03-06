@@ -138,90 +138,93 @@
                         <div id="opr-meta" class="text-[10px] font-bold text-slate-500 flex gap-2 justify-end uppercase mt-2 tracking-wider"></div>
                     </div>
                 </div>
-                <div class="bg-slate-900 text-white p-8 mb-8 text-center shadow-xl">
+                <div class="bg-slate-900 text-white p-8 mb-8 text-center shadow-xl rounded-2xl">
                     <h3 class="text-2xl font-black uppercase leading-tight tracking-tight break-words" id="opr-title-display">-</h3>
                 </div>
                 
-                <!-- Main Image OR Infographic Area -->
-                <div class="w-full h-80 bg-slate-100 mb-10 overflow-hidden flex items-center justify-center border border-slate-200 rounded-sm shadow-inner relative">
-                    <!-- Standard Image Component -->
-                    <img id="opr-main-img" src="" alt="Aktiviti" class="w-full h-full object-cover hidden">
+                <!-- NEW: Full Infographic Report Area (Tiada Imej Lagi) -->
+                <div class="flex flex-col gap-6">
                     
-                    <!-- Fallback Placeholder (In case image strictly fails) -->
-                    <div id="opr-img-placeholder" class="text-slate-300 flex-col items-center hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <p class="text-xs font-bold uppercase tracking-[0.3em] italic">Tiada Pautan Imej</p>
-                    </div>
-
-                    <!-- NEW: Infographic Replacement Component -->
-                    <div id="opr-main-infographic" class="w-full h-full hidden bg-gradient-to-br from-slate-800 to-slate-900 text-white p-10 relative flex-col justify-between">
+                    <!-- Top Banner Infographic -->
+                    <div class="w-full bg-gradient-to-br from-slate-800 to-slate-900 text-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-slate-700 relative overflow-hidden">
                         <!-- Decorative background element -->
                         <div class="absolute top-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[80px] -mr-20 -mt-20"></div>
                         <div class="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-[60px] -ml-20 -mb-20"></div>
-                        
-                        <div class="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-6">
-                                    <span id="opr-info-status" class="px-4 py-1.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/30">Status</span>
-                                    <span id="opr-info-branch" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-white/5 px-3 py-1 rounded border border-white/10">UNIT</span>
+
+                        <div class="relative z-10">
+                            <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+                                <span id="opr-info-status" class="px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm">Status</span>
+                                <span id="opr-info-branch" class="text-xs text-slate-300 font-bold uppercase tracking-widest bg-white/10 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm shadow-sm">UNIT</span>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-blue-300 font-bold text-sm mb-8 bg-blue-900/30 w-fit px-5 py-2.5 rounded-xl border border-blue-800/50 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <p id="opr-info-dates" class="tracking-wide uppercase">12 Jan - 15 Jan 2026 | IAB</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700/80 pt-8 mt-4">
+                                <div class="bg-black/20 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8v8"></path></svg></div>
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Waran / Bajet</p>
+                                    </div>
+                                    <p id="opr-info-alloc" class="text-2xl font-black text-white ml-11">RM 0.00</p>
                                 </div>
-                                <h2 id="opr-info-title" class="text-3xl font-black leading-tight uppercase tracking-tight text-white mb-3 break-words line-clamp-3">Nama Program</h2>
-                                <div class="flex items-center gap-2 text-blue-300 font-medium text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <p id="opr-info-dates">12 Jan - 15 Jan 2026 | IAB</p>
+                                <div class="bg-black/20 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Telah Dibelanjakan</p>
+                                    </div>
+                                    <p id="opr-info-spent" class="text-2xl font-black text-emerald-400 ml-11">RM 0.00</p>
+                                </div>
+                                <div class="bg-black/20 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center"><svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div>
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Kapasiti Peserta</p>
+                                    </div>
+                                    <p id="opr-info-pax" class="text-2xl font-black text-purple-400 ml-11">0 Orang</p>
                                 </div>
                             </div>
-                            
-                            <div class="grid grid-cols-3 gap-6 border-t border-slate-700/80 pt-6 mt-6">
-                                <div class="bg-black/20 p-4 rounded-xl border border-white/5 backdrop-blur-sm">
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Waran / Bajet</p>
-                                    <p id="opr-info-alloc" class="text-xl font-black text-white">RM 0.00</p>
-                                </div>
-                                <div class="bg-black/20 p-4 rounded-xl border border-white/5 backdrop-blur-sm">
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Telah Dibelanjakan</p>
-                                    <p id="opr-info-spent" class="text-xl font-black text-emerald-400">RM 0.00</p>
-                                </div>
-                                <div class="bg-black/20 p-4 rounded-xl border border-white/5 backdrop-blur-sm">
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Kapasiti Peserta</p>
-                                    <p id="opr-info-pax" class="text-xl font-black text-blue-400">0 Orang</p>
-                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Details (Obj, Act, Impact) in Infographic Style -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print-stack mt-2">
+                        <!-- Objektif Card -->
+                        <div class="bg-blue-50/80 rounded-[2rem] p-8 border border-blue-100 shadow-sm print-stack-item relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-6 opacity-10"><svg class="w-20 h-20 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+                            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-blue-200/60 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl shadow-md">1</div>
+                                <h4 class="text-xl font-black text-blue-900 uppercase tracking-widest">Objektif</h4>
                             </div>
+                            <p class="text-[13px] text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap break-words relative z-10" id="opr-objective-display">-</p>
+                        </div>
+
+                        <!-- Aktiviti Card -->
+                        <div class="bg-indigo-50/80 rounded-[2rem] p-8 border border-indigo-100 shadow-sm print-stack-item relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-6 opacity-10"><svg class="w-20 h-20 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg></div>
+                            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-indigo-200/60 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-md">2</div>
+                                <h4 class="text-xl font-black text-indigo-900 uppercase tracking-widest">Aktiviti</h4>
+                            </div>
+                            <p class="text-[13px] text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap break-words relative z-10" id="opr-activity-display">-</p>
+                        </div>
+
+                        <!-- Impak Card -->
+                        <div class="bg-emerald-50/80 rounded-[2rem] p-8 border border-emerald-100 shadow-sm print-stack-item relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-6 opacity-10"><svg class="w-20 h-20 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg></div>
+                            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-emerald-200/60 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-md">3</div>
+                                <h4 class="text-xl font-black text-emerald-900 uppercase tracking-widest">Impak</h4>
+                            </div>
+                            <p class="text-[13px] text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap break-words relative z-10" id="opr-impact-display">-</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-12 print-stack">
-                    <div class="col-span-12 md:col-span-5 border-r-2 border-slate-100 pr-8 text-justify print-stack-item">
-                        <div class="mb-10"><div class="flex items-center gap-3 mb-4"><div class="w-2.5 h-8 bg-blue-600"></div><h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Objektif</h4></div><p class="text-[13px] text-slate-700 leading-relaxed italic font-medium whitespace-pre-wrap break-words" id="opr-objective-display">-</p></div>
-                        <div><div class="flex items-center gap-3 mb-4"><div class="w-2.5 h-8 bg-blue-600"></div><h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Aktiviti Utama</h4></div><p class="text-[13px] text-slate-700 leading-relaxed whitespace-pre-wrap break-words" id="opr-activity-display">-</p></div>
-                    </div>
-                    <div class="col-span-12 md:col-span-7 print-stack-item">
-                        <div class="mb-10"><div class="flex items-center gap-3 mb-4"><div class="w-2.5 h-8 bg-emerald-500"></div><h4 class="text-lg font-black text-slate-900 uppercase tracking-widest">Impak / Hasil</h4></div><p class="text-[13px] text-slate-700 leading-relaxed text-justify italic font-medium whitespace-pre-wrap break-words" id="opr-impact-display">-</p></div>
-                        
-                        <div class="print-gallery-container">
-                            <div class="flex items-center gap-3 mb-6"><div class="w-2.5 h-5 bg-slate-300"></div><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest">Galeri Tambahan</h4></div>
-                            <div class="grid grid-cols-4 gap-4">
-                                <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                    <span id="opr-extra-span-1" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Imej</span>
-                                    <img id="opr-extra-1" src="" class="w-full h-full object-cover hidden relative z-10">
-                                </div>
-                                <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                    <span id="opr-extra-span-2" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Imej</span>
-                                    <img id="opr-extra-2" src="" class="w-full h-full object-cover hidden relative z-10">
-                                </div>
-                                <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                    <span id="opr-extra-span-3" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Imej</span>
-                                    <img id="opr-extra-3" src="" class="w-full h-full object-cover hidden relative z-10">
-                                </div>
-                                <div class="aspect-square bg-slate-50 border border-slate-100 flex flex-col items-center justify-center overflow-hidden rounded-sm shadow-sm relative">
-                                    <span id="opr-extra-span-4" class="text-[8px] font-bold text-slate-300 uppercase tracking-widest absolute text-center px-1">Tiada Imej</span>
-                                    <img id="opr-extra-4" src="" class="w-full h-full object-cover hidden relative z-10">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="mt-12 pt-6 border-t border-slate-200 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                    <p>Dashboard LDP-BPG 050202 Infographic Report</p><p id="opr-footer-date"></p>
                 </div>
-                <div class="mt-16 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]"><p>Dashboard LDP-BPG 050202 Live Report</p><p id="opr-footer-date"></p></div>
             </div>
         </div>
     </div>
@@ -485,77 +488,28 @@
 
             document.getElementById('opr-title-display').innerText = item.name;
             document.getElementById('opr-meta').innerHTML = `<span>TARIKH: ${item.startDate} - ${item.endDate}</span> | <span>LOKASI: ${item.location || 'IAB'}</span> | <span>UNIT: ${item.branch}</span>`;
-            document.getElementById('opr-objective-display').innerText = item.objective || "Laporan belum dikemas kini.";
-            document.getElementById('opr-activity-display').innerText = item.activity || "Laporan belum dikemas kini.";
-            document.getElementById('opr-impact-display').innerText = item.impact || "Laporan belum dikemas kini.";
+            
+            // Populasikan Teks (Objektif, Aktiviti, Impak) di dalam Kad Baru
+            document.getElementById('opr-objective-display').innerText = item.objective || "Maklumat belum dikemas kini.";
+            document.getElementById('opr-activity-display').innerText = item.activity || "Maklumat belum dikemas kini.";
+            document.getElementById('opr-impact-display').innerText = item.impact || "Maklumat belum dikemas kini.";
             document.getElementById('opr-footer-date').innerText = "Dijana pada: " + new Date().toLocaleString('ms-MY');
             
-            // Komponen Gambar OPR
-            const imgMainEl = document.getElementById('opr-main-img');
-            const placeholderEl = document.getElementById('opr-img-placeholder');
-            const infoGraphicEl = document.getElementById('opr-main-infographic');
+            // Populasikan Banner Infografik Utama
+            const status = getOPRStatus(item.endDate, item.objective);
+            const stLabel = document.getElementById('opr-info-status');
+            stLabel.innerText = status.label;
             
-            let hasValidMainImage = item.imgMain && item.imgMain.length > 5 && isValidUrl(item.imgMain);
-            const driveIdMain = getDriveId(item.imgMain);
-
-            // Tentukan apa yang patut keluar di kotak utama OPR (Gambar ATAU Infografik)
-            if (hasValidMainImage) {
-                imgMainEl.src = driveIdMain ? `https://drive.google.com/uc?export=view&id=${driveIdMain}` : item.imgMain;
-                imgMainEl.onerror = () => { 
-                    imgMainEl.onerror = null; 
-                    imgMainEl.src = driveIdMain ? `https://drive.google.com/thumbnail?id=${driveIdMain}&sz=w1000` : ''; 
-                    // Jika fail masih juga tak dapat dibaca, paparkan infografik automatik
-                    setTimeout(() => { if (!imgMainEl.complete || imgMainEl.naturalHeight === 0) showInfographic(); }, 500);
-                };
-                imgMainEl.classList.remove('hidden');
-                placeholderEl.classList.add('hidden');
-                infoGraphicEl.classList.add('hidden');
-            } else {
-                showInfographic();
-            }
-
-            function showInfographic() {
-                imgMainEl.classList.add('hidden');
-                placeholderEl.classList.add('hidden');
-                infoGraphicEl.classList.remove('hidden');
-                infoGraphicEl.classList.add('flex');
-                
-                const status = getOPRStatus(item.endDate, item.objective);
-                const stLabel = document.getElementById('opr-info-status');
-                stLabel.innerText = status.label;
-                stLabel.style.color = status.label.includes('Tempoh') ? '#60a5fa' : (status.label === 'Tersedia' ? '#34d399' : '#f87171');
-                
-                document.getElementById('opr-info-branch').innerText = item.branch || 'Pusat Berkaitan';
-                document.getElementById('opr-info-title').innerText = item.name;
-                document.getElementById('opr-info-dates').innerText = `${item.startDate} hingga ${item.endDate} | ${item.location || 'IAB'}`;
-                document.getElementById('opr-info-alloc').innerText = formatRM(item.alloc);
-                document.getElementById('opr-info-spent').innerText = formatRM(item.spent);
-                document.getElementById('opr-info-pax').innerText = `${item.participants || 0} Orang`;
-            }
-
-            // Setup Gambar Ekstra (Sokongan 1-4)
-            const setupExtraImage = (elId, spanId, url) => {
-                const imgEl = document.getElementById(elId);
-                const spanEl = document.getElementById(spanId);
-                const driveId = getDriveId(url);
-                let hasValidImage = url && url.length > 5 && isValidUrl(url);
-
-                if (hasValidImage) { 
-                    imgEl.src = driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : url;
-                    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : ''; };
-                    imgEl.classList.remove('hidden'); 
-                    if(spanEl) spanEl.classList.add('hidden'); 
-                } else { 
-                    imgEl.src = '';
-                    imgEl.classList.add('hidden'); 
-                    if(spanEl) {
-                        spanEl.classList.remove('hidden'); 
-                        spanEl.innerText = url && url.length > 0 ? "Bukan Pautan" : "Tiada Imej";
-                    }
-                }
-            };
-
-            for(let k=1; k<=4; k++) setupExtraImage(`opr-extra-${k}`, `opr-extra-span-${k}`, item[`imgEx${k}`]);
+            // Warnakan badge status secara dinamik
+            stLabel.style.color = status.label.includes('Tempoh') ? '#60a5fa' : (status.label === 'Tersedia' ? '#34d399' : '#f87171');
+            stLabel.style.borderColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.4)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(248, 113, 113, 0.4)');
+            stLabel.style.backgroundColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.15)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)');
+            
+            document.getElementById('opr-info-branch').innerText = item.branch || 'Pusat Berkaitan';
+            document.getElementById('opr-info-dates').innerText = `${item.startDate} hingga ${item.endDate} | ${item.location || 'IAB'}`;
+            document.getElementById('opr-info-alloc').innerText = formatRM(item.alloc);
+            document.getElementById('opr-info-spent').innerText = formatRM(item.spent);
+            document.getElementById('opr-info-pax').innerText = `${item.participants || 0} Orang`;
             
             document.getElementById('opr-modal').classList.remove('hidden');
         };
