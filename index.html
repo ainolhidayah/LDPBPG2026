@@ -63,6 +63,41 @@
             /* MODE 1: Cetak Dashboard Utama */
             body:not(.print-opr-mode) #opr-modal { display: none !important; }
             
+            /* --- TAMBAHAN BARU: Membaiki teks hilang dalam kad Infografik semasa cetak --- */
+            body:not(.print-opr-mode) #gallery-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important; /* Paksa jadi 2 lajur supaya kemas */
+                gap: 15px !important;
+            }
+            body:not(.print-opr-mode) .gallery-item {
+                border: 2px solid #cbd5e1 !important;
+                background: #f8fafc !important;
+                min-height: auto !important;
+                page-break-inside: avoid !important; /* Elak kotak terpotong dua muka surat */
+            }
+            /* Sembunyikan lapisan latar belakang imej/kecerunan gelap */
+            body:not(.print-opr-mode) .gallery-item > div:first-child {
+                display: none !important; 
+            }
+            /* Jadikan lapisan teks sebagai lapisan biasa (bukan absolute) */
+            body:not(.print-opr-mode) .gallery-item > div:nth-child(2) {
+                position: relative !important; 
+                background: none !important;
+                padding: 1.5rem !important;
+            }
+            /* Paksa semua tulisan menjadi warna gelap dan sentiasa jelas tanpa perlu 'hover' */
+            body:not(.print-opr-mode) .gallery-item * {
+                color: #0f172a !important; 
+                text-shadow: none !important;
+                opacity: 1 !important; 
+                transform: none !important;
+            }
+            /* Tukar warna garisan pemisah menjadi lebih gelap */
+            body:not(.print-opr-mode) .gallery-item .border-white\/20 {
+                border-color: #cbd5e1 !important;
+            }
+            /* ------------------------------------------------------------------------- */
+            
             /* MODE 2: Cetak OPR Modal */
             body.print-opr-mode header,
             body.print-opr-mode main,
