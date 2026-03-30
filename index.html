@@ -20,6 +20,7 @@
         
         /* Tab Navigation Styles */
         .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
+        .waran-btn { transition: all 0.3s ease; }
         
         .btn-analisis-custom { 
             background-color: #fbbf24; 
@@ -152,7 +153,6 @@
             }
         }
 
-        /* Kelas khas semasa proses tangkapan imej (PNG) sedang berjalan */
         body.capturing-png .backdrop-blur-sm,
         body.capturing-png .backdrop-blur-md {
             backdrop-filter: none !important;
@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    <!-- OPR Modal -->
+    <!-- OPR Modal (Tiada perubahan, sama seperti asal) -->
     <div id="opr-modal" class="fixed inset-0 z-[150] hidden overflow-y-auto bg-slate-900/95 backdrop-blur-md p-4 md:p-8">
         <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 relative" id="opr-modal-content">
             <div class="no-print absolute top-6 right-6 flex gap-3 z-50">
@@ -210,7 +210,6 @@
                 </div>
                 
                 <div class="flex flex-col gap-6">
-                    <!-- Top Banner Infographic -->
                     <div class="w-full bg-gradient-to-br from-slate-800 to-slate-900 text-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-slate-700 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[80px] -mr-20 -mt-20"></div>
                         <div class="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-[60px] -ml-20 -mb-20"></div>
@@ -255,7 +254,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Details (Obj, Act, Impact) in Infographic Style -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print-stack mt-2">
                         <!-- Objektif Card -->
                         <div class="bg-blue-50/80 rounded-[2rem] p-8 border border-blue-100 shadow-sm print-stack-item relative overflow-hidden group">
@@ -323,44 +321,36 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6">
-        <!-- Navigation Tabs -->
-        <div class="flex flex-wrap gap-4 mb-10 bg-slate-200/40 p-2.5 rounded-[2rem] w-fit shadow-inner">
-            <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn btn-analisis-custom active px-10 py-3.5 rounded-[1.5rem] text-sm font-black uppercase tracking-wider">Analisis Keseluruhan</button>
-            <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Pemerkasaan COE</button>
-            <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Certified Assessor</button>
-            <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Lead Auditor</button>
-            <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">LDP-PBD</button>
+        
+        <!-- Navigation Tabs & Waran Filter -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 mb-10 no-print">
+            <!-- Tabs Program -->
+            <div class="flex flex-wrap gap-3 bg-slate-200/40 p-2.5 rounded-[2rem] w-fit shadow-inner">
+                <button onclick="switchTab('analisis')" id="btn-analisis" class="tab-btn btn-analisis-custom active px-10 py-3.5 rounded-[1.5rem] text-sm font-black uppercase tracking-wider">Analisis Keseluruhan</button>
+                <button onclick="switchTab('coe')" id="btn-coe" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Pemerkasaan COE</button>
+                <button onclick="switchTab('assessor')" id="btn-assessor" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Certified Assessor</button>
+                <button onclick="switchTab('lead')" id="btn-lead" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">Lead Auditor</button>
+                <button onclick="switchTab('pbd')" id="btn-pbd" class="tab-btn px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-slate-500 bg-white/40 hover:bg-white hover:text-blue-600">LDP-PBD</button>
+            </div>
+            
+            <!-- Filter Waran -->
+            <div class="flex p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                <button onclick="setWaranFilter('all')" id="wfilter-all" class="waran-btn px-6 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-sm">Semua Waran</button>
+                <button onclick="setWaranFilter(1)" id="wfilter-1" class="waran-btn px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50">Waran Pertama</button>
+                <button onclick="setWaranFilter(2)" id="wfilter-2" class="waran-btn px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50">Waran Kedua</button>
+            </div>
+        </div>
+
+        <!-- NEW: Deficit Alert Container (Injected via JS if Deficit exists) -->
+        <div id="deficit-alert-container"></div>
+
+        <!-- NEW: OS Financial Breakdown Cards (replaces the old #ceiling-section) -->
+        <div id="os-financial-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 hidden">
+            <!-- Populated via JS -->
         </div>
 
         <!-- Balanced KPI Grid -->
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-10" id="kpi-container"></div>
-
-        <!-- NEW: Perbandingan Waran 1 & 2 Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 hidden" id="waran-comparison-container">
-            <!-- Injected via JS -->
-        </div>
-
-        <!-- Analysis Specific Section (Syiling) -->
-        <div id="ceiling-section" class="mb-10 hidden">
-            <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border-b-8 border-blue-600">
-                <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-                    <div class="max-w-lg">
-                        <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-blue-400">SYILING AGIHAN PERUNTUKAN LDP-050202 IAB 2026</span>
-                        <h2 class="text-2xl font-black mt-4 leading-tight uppercase tracking-tight italic">Ringkasan Syiling & Baki Keseluruhan</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:w-auto text-center text-white">
-                        <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 min-w-[220px]">
-                            <p class="text-[10px] font-bold uppercase opacity-60 mb-2 tracking-widest">Jumlah Syiling</p>
-                            <p class="text-2xl font-black" id="ceiling-total">RM 0.00</p>
-                        </div>
-                        <div id="ceiling-balance-card" class="p-6 rounded-3xl border min-w-[220px]">
-                            <p class="text-[10px] font-bold uppercase opacity-80 mb-2 tracking-widest">Baki Syiling</p>
-                            <p class="text-2xl font-black" id="ceiling-balance">RM 0.00</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
@@ -379,7 +369,7 @@
             <div class="lg:col-span-4 space-y-8">
                 <!-- Performance Gauge -->
                 <div id="gauge-container" class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200 text-center">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Meter Prestasi Perbelanjaan Keseluruhan</h3>
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Prestasi Perbelanjaan</h3>
                     <div style="height: 160px; position: relative;">
                         <canvas id="gaugeChart"></canvas>
                         <div id="gauge-value" class="absolute inset-0 flex items-center justify-center mt-14">
@@ -475,14 +465,16 @@
         };
 
         let liveData = {
-            analisis: { items: [], ceiling: null, warrant: null },
+            analisis: { items: [], syiling: { 1: {os21:0, os29:0, total:0}, 2: {os21:0, os29:0, total:0}, total: {os21:0, os29:0, total:0} } },
             coe: { items: [] }, assessor: { items: [] }, lead: { items: [] }, pbd: { items: [] }
         };
 
         let activeTabKey = 'analisis';
+        let activeWaranFilter = 'all'; // 'all', 1, 2
+        
         let mainChart, pieChart, countPieChart, gaugeChart;
 
-        const formatRM = (v) => new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(v || 0);
+        const formatRM = (v) => new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(v || 0);
         const cleanVal = (str) => { if (!str) return 0; let val = str.replace(/[RM,\s]/gi, '').replace(/\((.*)\)/, '-$1'); return parseFloat(val) || 0; };
 
         const isValidUrl = (string) => {
@@ -675,8 +667,26 @@
                     const rows = parseCSV(text);
 
                     if (key === 'analisis') {
-                        if (rows[1]) liveData.analisis.ceiling = { total: cleanVal(rows[1][5]) };
-                        if (rows[3]) liveData.analisis.warrant = { os21: cleanVal(rows[3][3]), os29: cleanVal(rows[3][4]), total: cleanVal(rows[3][5]) };
+                        // KUTIP SYILING MENGIKUT OS & WARAN
+                        let w1Found = false;
+                        for(let r=0; r<Math.min(rows.length, 15); r++) {
+                            if(!rows[r]) continue;
+                            const rowStr = rows[r].join(" ").toUpperCase();
+                            if(rowStr.includes("FASA 1") || rowStr.includes("WARAN PERTAMA")) {
+                                liveData.analisis.syiling[1] = { os21: cleanVal(rows[r][3]), os29: cleanVal(rows[r][4]), total: cleanVal(rows[r][5]) };
+                                w1Found = true;
+                            } else if(w1Found && (rowStr.includes("FASA 2") || rowStr.includes("WARAN KEDUA") || rowStr.includes("BELUM TERIMA"))) {
+                                liveData.analisis.syiling[2] = { os21: cleanVal(rows[r][3]), os29: cleanVal(rows[r][4]), total: cleanVal(rows[r][5]) };
+                                break;
+                            }
+                        }
+                        // Kira Jumlah Keseluruhan Syiling
+                        liveData.analisis.syiling.total = {
+                            os21: liveData.analisis.syiling[1].os21 + liveData.analisis.syiling[2].os21,
+                            os29: liveData.analisis.syiling[1].os29 + liveData.analisis.syiling[2].os29,
+                            total: liveData.analisis.syiling[1].total + liveData.analisis.syiling[2].total
+                        };
+
                         const items = [];
                         let currentWaran = 1;
                         for(let i=0; i<rows.length; i++) {
@@ -731,11 +741,147 @@
             finally { setTimeout(() => document.getElementById('loading').style.display = 'none', 800); }
         }
 
+        // --- FILTER WARAN BUTTON LOGIC ---
+        window.setWaranFilter = function(waranVal) {
+            activeWaranFilter = waranVal;
+            ['all', 1, 2].forEach(val => {
+                const btn = document.getElementById(`wfilter-${val}`);
+                if(btn) {
+                    if (val === waranVal) {
+                        btn.className = "waran-btn px-6 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-sm";
+                    } else {
+                        btn.className = "waran-btn px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50";
+                    }
+                }
+            });
+            updateUI();
+        }
+
         function updateUI() {
-            const current = liveData[activeTabKey];
-            const items = current.items || [];
-            const isAnalisis = activeTabKey === 'analisis';
+            const currentTabRaw = liveData[activeTabKey];
+            const allItemsRaw = currentTabRaw.items || [];
             
+            // Penapisan Waran pada Data
+            const items = activeWaranFilter === 'all' ? allItemsRaw : allItemsRaw.filter(i => i.waran === activeWaranFilter);
+            
+            const isAnalisis = activeTabKey === 'analisis';
+            const allProgramItems = [...liveData.lead.items, ...liveData.coe.items, ...liveData.assessor.items, ...liveData.pbd.items];
+            
+            // ---------------------------------------------------------
+            // PERBANDINGAN SYILING & AGIHAN (Defisit Check)
+            // ---------------------------------------------------------
+            const sData = liveData.analisis.syiling;
+            const agihanW1 = { os21: 0, os29: 0 };
+            const agihanW2 = { os21: 0, os29: 0 };
+            const perbelanjaanW1 = { os21: 0, os29: 0 };
+            const perbelanjaanW2 = { os21: 0, os29: 0 };
+
+            allProgramItems.forEach(i => {
+                if (i.waran === 1) { 
+                    agihanW1.os21 += i.os21; agihanW1.os29 += i.os29; 
+                    perbelanjaanW1.os21 += i.spent * (i.os21 / (i.alloc||1)); // Estimate spent per OS
+                    perbelanjaanW1.os29 += i.spent * (i.os29 / (i.alloc||1));
+                }
+                if (i.waran === 2) { 
+                    agihanW2.os21 += i.os21; agihanW2.os29 += i.os29; 
+                    perbelanjaanW2.os21 += i.spent * (i.os21 / (i.alloc||1));
+                    perbelanjaanW2.os29 += i.spent * (i.os29 / (i.alloc||1));
+                }
+            });
+
+            const bakiW1 = { os21: sData[1].os21 - agihanW1.os21, os29: sData[1].os29 - agihanW1.os29 };
+            const bakiW2 = { os21: sData[2].os21 - agihanW2.os21, os29: sData[2].os29 - agihanW2.os29 };
+
+            // Check Defisit & Tunjuk Amaran
+            let alertHTML = '';
+            const addDeficitAlert = (wLabel, osLabel, bakiVal) => {
+                if(bakiVal < 0) {
+                    alertHTML += `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500"></div><span>${wLabel} - <strong>${osLabel}</strong>: Kurangan <span class="text-red-700 font-extrabold px-1 bg-red-100 rounded">${formatRM(Math.abs(bakiVal))}</span> (Agihan melebihi Syiling)</span></li>`;
+                }
+            };
+            
+            if(activeWaranFilter === 'all' || activeWaranFilter === 1) {
+                addDeficitAlert("Waran Pertama", "OS21000", bakiW1.os21);
+                addDeficitAlert("Waran Pertama", "OS29000", bakiW1.os29);
+            }
+            if(activeWaranFilter === 'all' || activeWaranFilter === 2) {
+                addDeficitAlert("Waran Kedua", "OS21000", bakiW2.os21);
+                addDeficitAlert("Waran Kedua", "OS29000", bakiW2.os29);
+            }
+
+            const alertContainer = document.getElementById('deficit-alert-container');
+            if(alertHTML && isAnalisis) {
+                alertContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl shadow-sm flex items-start gap-4 mb-8">
+                        <div class="bg-red-100 p-2 rounded-full text-red-600"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
+                        <div>
+                            <h4 class="text-red-800 font-extrabold text-lg uppercase tracking-tight">Amaran: Terlebih Agihan Peruntukan</h4>
+                            <p class="text-red-700 text-sm mt-0.5 font-medium">Peruntukan yang diagihkan kepada program melepasi had syiling yang ditetapkan:</p>
+                            <ul class="mt-3 text-[13px] text-red-800 space-y-2">${alertHTML}</ul>
+                        </div>
+                    </div>
+                `;
+            } else { alertContainer.innerHTML = ''; }
+
+            // UPDATE OS FINANCIAL CARDS (React Style)
+            const osCards = document.getElementById('os-financial-cards');
+            if (isAnalisis) {
+                osCards.classList.remove('hidden');
+                
+                let targetSyiling = { os21:0, os29:0, total:0 };
+                let targetAgihan = { os21:0, os29:0 };
+                let targetPerbelanjaan = { os21:0, os29:0 };
+                let targetBaki = { os21:0, os29:0 };
+
+                if (activeWaranFilter === 'all') {
+                    targetSyiling = sData.total;
+                    targetAgihan = { os21: agihanW1.os21 + agihanW2.os21, os29: agihanW1.os29 + agihanW2.os29 };
+                    targetPerbelanjaan = { os21: perbelanjaanW1.os21 + perbelanjaanW2.os21, os29: perbelanjaanW1.os29 + perbelanjaanW2.os29 };
+                    targetBaki = { os21: targetSyiling.os21 - targetAgihan.os21, os29: targetSyiling.os29 - targetAgihan.os29 };
+                } else if (activeWaranFilter === 1) {
+                    targetSyiling = sData[1]; targetAgihan = agihanW1; targetPerbelanjaan = perbelanjaanW1; targetBaki = bakiW1;
+                } else {
+                    targetSyiling = sData[2]; targetAgihan = agihanW2; targetPerbelanjaan = perbelanjaanW2; targetBaki = bakiW2;
+                }
+
+                const renderCard = (title, os21, os29, isLebihan = false) => {
+                    const total = os21 + os29;
+                    const isDeficit21 = isLebihan && os21 < 0;
+                    const isDeficit29 = isLebihan && os29 < 0;
+                    const isDeficitTotal = isLebihan && total < 0;
+                    const bgClass = (isLebihan && (isDeficit21 || isDeficit29)) ? 'bg-red-50 border-red-200' : 'bg-white border-slate-200';
+                    
+                    return `
+                        <div class="p-6 rounded-3xl border shadow-sm ${bgClass} flex flex-col justify-between">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${title}</p>
+                                <h3 class="text-2xl font-black mt-2 ${isDeficitTotal ? 'text-red-600' : 'text-slate-800'}">${formatRM(total)}</h3>
+                            </div>
+                            <div class="space-y-2 mt-6 pt-4 border-t border-slate-100">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-500 font-bold">OS21000:</span>
+                                    <span class="font-black ${isDeficit21 ? 'text-red-600' : 'text-slate-700'}">${formatRM(os21)}</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-500 font-bold">OS29000:</span>
+                                    <span class="font-black ${isDeficit29 ? 'text-red-600' : 'text-slate-700'}">${formatRM(os29)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                osCards.innerHTML = `
+                    ${renderCard("Syiling Diterima", targetSyiling.os21, targetSyiling.os29)}
+                    ${renderCard("Agihan Ke Program", targetAgihan.os21, targetAgihan.os29)}
+                    ${renderCard("Lebihan / (Kurangan) Syiling", targetBaki.os21, targetBaki.os29, true)}
+                    ${renderCard("Anggaran Belanja", targetPerbelanjaan.os21, targetPerbelanjaan.os29)}
+                `;
+            } else {
+                osCards.classList.add('hidden');
+            }
+            // ---------------------------------------------------------
+
             const mainTable = document.getElementById('main-table');
             mainTable.className = `w-full text-left border-collapse ${isAnalisis ? 'min-w-[800px]' : 'min-w-[1400px]'}`;
 
@@ -743,112 +889,32 @@
             const tSpent = items.reduce((a, b) => a + (b.spent||0), 0);
             const perc = tAlloc > 0 ? (tSpent/tAlloc*100).toFixed(1) : 0;
             
-            const allProgramItems = [...liveData.lead.items, ...liveData.coe.items, ...liveData.assessor.items, ...liveData.pbd.items];
-            const sourceItemsForWaranCalc = isAnalisis ? allProgramItems : items;
+            // Pilih syiling untuk dipaparkan di KPI (mengikut tab/waran filter)
+            let warrantTotalForKPI = 0;
+            if (activeWaranFilter === 'all') warrantTotalForKPI = sData.total.total;
+            else if (activeWaranFilter === 1) warrantTotalForKPI = sData[1].total;
+            else if (activeWaranFilter === 2) warrantTotalForKPI = sData[2].total;
 
-            // --- PERBANDINGAN WARAN PERTAMA VS KEDUA ---
-            const validWaranItems = sourceItemsForWaranCalc.filter(i => i.alloc > 0 || i.spent > 0 || (i.name && i.name.trim().length > 3));
-            const w1Items = validWaranItems.filter(i => i.waran === 1);
-            const w2Items = validWaranItems.filter(i => i.waran === 2);
+            const targetProgramsForOPR = isAnalisis ? allProgramItems : items;
+            const filteredOPRPrograms = activeWaranFilter === 'all' ? targetProgramsForOPR : targetProgramsForOPR.filter(i => i.waran === activeWaranFilter);
 
-            const w1Alloc = w1Items.reduce((a, b) => a + (b.alloc||0), 0);
-            const w1Spent = w1Items.reduce((a, b) => a + (b.spent||0), 0);
-            const w1Bal = w1Alloc - w1Spent;
-            const w1Perc = w1Alloc > 0 ? (w1Spent/w1Alloc*100).toFixed(1) : 0;
-
-            const w2Alloc = w2Items.reduce((a, b) => a + (b.alloc||0), 0);
-            const w2Spent = w2Items.reduce((a, b) => a + (b.spent||0), 0);
-            const w2Bal = w2Alloc - w2Spent;
-            const w2Perc = w2Alloc > 0 ? (w2Spent/w2Alloc*100).toFixed(1) : 0;
-
-            document.getElementById('waran-comparison-container').classList.remove('hidden');
-            document.getElementById('waran-comparison-container').innerHTML = `
-                <!-- Waran 1 Card -->
-                <div class="bg-gradient-to-br from-blue-900 to-slate-900 rounded-[2.5rem] p-8 text-white shadow-lg border border-blue-800 relative overflow-hidden group hover:shadow-2xl transition-all">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/20 rounded-full blur-[40px] group-hover:bg-blue-500/30 transition-all"></div>
-                    <div class="flex justify-between items-center mb-6 border-b border-blue-800/60 pb-4 relative z-10">
-                        <h3 class="text-xl font-black uppercase tracking-widest flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-800/50 flex items-center justify-center text-blue-300">1</div>
-                            Waran Pertama
-                        </h3>
-                        <span class="bg-blue-800/50 text-blue-300 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-blue-700/50 shadow-inner">${w1Perc}% Belanja</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-6 text-center relative z-10">
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-blue-300/80 uppercase tracking-widest mb-2">Peruntukan</p>
-                            <p class="text-lg font-black text-white break-words">${formatRM(w1Alloc)}</p>
-                        </div>
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-2">Perbelanjaan</p>
-                            <p class="text-lg font-black text-emerald-400 break-words">${formatRM(w1Spent)}</p>
-                        </div>
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-amber-400/80 uppercase tracking-widest mb-2">Lebihan</p>
-                            <p class="text-lg font-black text-amber-400 break-words">${formatRM(w1Bal)}</p>
-                        </div>
-                    </div>
-                    <div class="mt-8 bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700/50 relative z-10 shadow-inner">
-                        <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: ${Math.min(w1Perc, 100)}%"></div>
-                    </div>
-                </div>
-
-                <!-- Waran 2 Card -->
-                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-[2.5rem] p-8 text-white shadow-lg border border-indigo-800 relative overflow-hidden group hover:shadow-2xl transition-all">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-[40px] group-hover:bg-indigo-500/30 transition-all"></div>
-                    <div class="flex justify-between items-center mb-6 border-b border-indigo-800/60 pb-4 relative z-10">
-                        <h3 class="text-xl font-black uppercase tracking-widest flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-indigo-800/50 flex items-center justify-center text-indigo-300">2</div>
-                            Waran Kedua
-                        </h3>
-                        <span class="bg-indigo-800/50 text-indigo-300 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-indigo-700/50 shadow-inner">${w2Perc}% Belanja</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-6 text-center relative z-10">
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-indigo-300/80 uppercase tracking-widest mb-2">Peruntukan</p>
-                            <p class="text-lg font-black text-white break-words">${formatRM(w2Alloc)}</p>
-                        </div>
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-2">Perbelanjaan</p>
-                            <p class="text-lg font-black text-emerald-400 break-words">${formatRM(w2Spent)}</p>
-                        </div>
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] font-bold text-amber-400/80 uppercase tracking-widest mb-2">Lebihan</p>
-                            <p class="text-lg font-black text-amber-400 break-words">${formatRM(w2Bal)}</p>
-                        </div>
-                    </div>
-                    <div class="mt-8 bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700/50 relative z-10 shadow-inner">
-                        <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: ${Math.min(w2Perc, 100)}%"></div>
-                    </div>
-                </div>
-            `;
-            // --------------------------------------------------------------------
-
-            const tOPRReady = allProgramItems.filter(i => (i.objective && i.objective.length > 5)).length;
-            const tOPRTotal = allProgramItems.length;
-            const warrantTotal = isAnalisis && liveData.analisis.warrant ? liveData.analisis.warrant.total : 0;
+            const tOPRReady = filteredOPRPrograms.filter(i => (i.objective && i.objective.length > 5)).length;
+            const tOPRTotal = filteredOPRPrograms.length;
 
             document.getElementById('kpi-container').innerHTML = `
-                <div class="bg-slate-900 p-6 rounded-[2.5rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran Diterima</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotal)}</h3></div>
+                <div class="bg-slate-900 p-6 rounded-[2.5rem] border border-slate-700 text-center shadow-lg"><p class="text-blue-400 text-[10px] font-black uppercase mb-2 tracking-widest">Waran ${activeWaranFilter !== 'all' ? activeWaranFilter : ''}</p><h3 class="text-xl font-black text-white">${formatRM(warrantTotalForKPI)}</h3></div>
                 <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Bajet Program</p><h3 class="text-xl font-black text-blue-600">${formatRM(tAlloc)}</h3></div>
                 <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Belanja Sebenar</p><h3 class="text-xl font-black text-slate-900">${formatRM(tSpent)}</h3></div>
                 <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Baki Peruntukan</p><h3 class="text-xl font-black text-emerald-600">${formatRM(tAlloc - tSpent)}</h3></div>
                 <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow"><p class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Prestasi</p><h3 class="text-xl font-black text-blue-800">${perc}%</h3></div>
-                <div class="bg-indigo-50 p-6 rounded-[2.5rem] border border-indigo-100 text-center shadow-sm border-2"><p class="text-indigo-600 text-[10px] font-black uppercase mb-2 tracking-widest">Laporan OPR</p><h3 class="text-xl font-black text-indigo-700">${isAnalisis ? tOPRReady + ' / ' + tOPRTotal : items.filter(i => (i.objective && i.objective.length > 5)).length + ' / ' + items.length}</h3></div>
+                <div class="bg-indigo-50 p-6 rounded-[2.5rem] border border-indigo-100 text-center shadow-sm border-2"><p class="text-indigo-600 text-[10px] font-black uppercase mb-2 tracking-widest">Laporan OPR</p><h3 class="text-xl font-black text-indigo-700">${tOPRReady} / ${tOPRTotal}</h3></div>
             `;
-
-            const ceilingSec = document.getElementById('ceiling-section');
-            if (isAnalisis && liveData.analisis.ceiling) {
-                ceilingSec.classList.remove('hidden');
-                const tCeil = liveData.analisis.ceiling.total;
-                document.getElementById('ceiling-total').innerText = formatRM(tCeil);
-                document.getElementById('ceiling-balance').innerText = formatRM(tCeil - tAlloc);
-            } else { ceilingSec.classList.add('hidden'); }
 
             const gallerySec = document.getElementById('activity-gallery-section');
             if (isAnalisis) {
                 gallerySec.classList.remove('hidden');
                 
-                document.getElementById('gallery-container').innerHTML = allProgramItems.length ? allProgramItems.map(img => {
+                document.getElementById('gallery-container').innerHTML = filteredOPRPrograms.length ? filteredOPRPrograms.map(img => {
                     const driveId = getDriveId(img.imgMain);
                     const hasValidImage = img.imgMain && img.imgMain.length > 5 && isValidUrl(img.imgMain);
                     
@@ -864,7 +930,6 @@
 
                     return `
                     <div class="gallery-item bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl border border-slate-200 flex flex-col h-full transition-all">
-                        <!-- Top Banner (Image/Gradient) -->
                         <div class="h-28 relative flex-shrink-0 border-b border-slate-100" style="${bgImageStyle}" onerror="this.style.backgroundImage='none'; this.style.background='linear-gradient(135deg, #1e293b, #0f172a)'">
                             <div class="absolute inset-0 bg-slate-900/30"></div>
                             <div class="absolute top-4 left-4 flex gap-2">
@@ -873,7 +938,6 @@
                             </div>
                         </div>
                         
-                        <!-- Main Content -->
                         <div class="p-6 flex flex-col flex-grow justify-between bg-white">
                             <div>
                                 <h4 class="text-slate-900 font-black text-[15px] leading-snug mb-5 break-words line-clamp-3" title="${img.name}">${img.name}</h4>
@@ -890,7 +954,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Button (Hilang masa cetak kerana no-print) -->
                             <button onclick="openOPRByName('${img.name.replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-[11px] font-bold transition-colors no-print flex justify-center items-center gap-2 mt-auto shadow-sm">
                                 Lihat Laporan OPR
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -908,13 +971,14 @@
             `;
 
             document.getElementById('table-body').innerHTML = items.length ? items.map((i, idx) => {
+                const waranBadge = i.waran === 1 
+                    ? `<span class="inline-block mt-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] uppercase font-black border border-blue-200 shadow-sm">Waran Pertama</span>`
+                    : `<span class="inline-block mt-2 px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[9px] uppercase font-black border border-indigo-200 shadow-sm">Waran Kedua</span>`;
+
                 if (isAnalisis) {
-                    return `<tr class="hover:bg-slate-50 transition-all text-sm group"><td class="px-8 py-6 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors break-words min-w-[250px] whitespace-normal">${i.name}</td><td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td><td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight border-l border-slate-50">${i.branch}</td></tr>`;
+                    return `<tr class="hover:bg-slate-50 transition-all text-sm group"><td class="px-8 py-6 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors break-words min-w-[250px] whitespace-normal">${i.name}<br>${waranBadge}</td><td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td><td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight border-l border-slate-50">${i.branch}</td></tr>`;
                 } else {
                     const status = getOPRStatus(i.endDate, i.objective);
-                    const waranBadge = i.waran === 1 
-                        ? `<span class="inline-block mt-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] uppercase font-black border border-blue-200 shadow-sm">Waran Pertama</span>`
-                        : `<span class="inline-block mt-2 px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[9px] uppercase font-black border border-indigo-200 shadow-sm">Waran Kedua</span>`;
 
                     return `
                         <tr class="hover:bg-slate-50 transition-all text-sm group text-justify">
@@ -932,9 +996,9 @@
                         </tr>
                     `;
                 }
-            }).join('') : `<tr><td colspan="12" class="px-8 py-10 text-center text-slate-300 italic font-medium">Data sedang dikemas kini...</td></tr>`;
+            }).join('') : `<tr><td colspan="12" class="px-8 py-10 text-center text-slate-300 italic font-medium">Tiada data dijumpai untuk kriteria ini.</td></tr>`;
 
-            renderCharts(items, warrantTotal, tSpent);
+            renderCharts(items, warrantTotalForKPI, tSpent);
         }
 
         function renderCharts(items, warrantTotal, totalSpent) {
@@ -1024,7 +1088,8 @@
                 document.getElementById('gauge-container').classList.add('hidden');
                 document.getElementById('os-pie-container').classList.remove('hidden');
             }
-            updateUI();
+            // Reset penapis waran bila tukar tab untuk elak kekeliruan
+            setWaranFilter('all'); 
         }
 
         window.onload = fetchAllData;
