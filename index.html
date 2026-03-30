@@ -8,7 +8,6 @@
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- TAMBAHAN BARU: Library untuk fungsi Auto-Jana Infografik kepada Imej (PNG) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -65,10 +64,9 @@
             /* MODE 1: Cetak Dashboard Utama */
             body:not(.print-opr-mode) #opr-modal { display: none !important; }
             
-            /* Susun atur Grid Galeri yang bersih untuk cetakan */
             body:not(.print-opr-mode) #gallery-container {
                 display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important; /* Paksa 2 lajur */
+                grid-template-columns: repeat(2, 1fr) !important;
                 gap: 15px !important;
             }
             
@@ -77,7 +75,6 @@
                 border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
             }
-            /* ------------------------------------------------------------------------- */
             
             /* MODE 2: Cetak OPR Modal */
             body.print-opr-mode header,
@@ -100,29 +97,24 @@
                 overflow: visible !important;
             }
             
-            /* --- KEMAS KINI: Baiki pepijat "Teks Ghaib" dalam PDF akibat fungsi Blur --- */
-            /* Sembunyikan elemen hiasan bulat (blur) sahaja supaya tak nampak kotor */
             body.print-opr-mode .blur-\[80px\],
             body.print-opr-mode .blur-\[60px\] {
                 display: none !important;
             }
 
-            /* PUNCA UTAMA: Fungsi 'backdrop-blur' menyebabkan browser gagal render teks ke PDF. Mesti dibuang masa print. */
             body.print-opr-mode .backdrop-blur-sm,
             body.print-opr-mode .backdrop-blur-md {
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
-                background-color: #1e293b !important; /* Tukar ke warna solid gelap */
+                background-color: #1e293b !important;
             }
             
-            /* Paksa kotak utama OPR untuk guna warna solid gelap (Gradient sering gagal dicetak oleh browser) */
             body.print-opr-mode #opr-main-infographic {
                 background: #0f172a !important; 
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
 
-            /* Memastikan teks dalam banner kekal terang (tidak ditukar hitam secara automatik oleh enjin PDF) */
             body.print-opr-mode #opr-main-infographic * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -132,20 +124,18 @@
                 color: #ffffff !important;
             }
             body.print-opr-mode #opr-info-spent {
-                color: #34d399 !important; /* warna hijau zamrud */
+                color: #34d399 !important; 
             }
             body.print-opr-mode #opr-info-pax {
-                color: #c084fc !important; /* warna ungu */
+                color: #c084fc !important; 
             }
             body.print-opr-mode #opr-info-dates {
-                color: #93c5fd !important; /* warna biru cair */
+                color: #93c5fd !important; 
             }
             body.print-opr-mode .text-slate-400 {
                 color: #94a3b8 !important; 
             }
-            /* ---------------------------------------------------------------------- */
             
-            /* Susun atur Grid OPR dibaiki supaya turun ke bawah jika diprint */
             body.print-opr-mode .print-stack {
                 display: block !important;
                 width: 100% !important;
@@ -162,12 +152,12 @@
             }
         }
 
-        /* TAMBAHAN BARU: Kelas khas semasa proses tangkapan imej (PNG) sedang berjalan */
+        /* Kelas khas semasa proses tangkapan imej (PNG) sedang berjalan */
         body.capturing-png .backdrop-blur-sm,
         body.capturing-png .backdrop-blur-md {
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
-            background-color: #1e293b !important; /* Paksa warna solid gelap supaya teks putih tidak hilang dalam PNG */
+            background-color: #1e293b !important;
         }
         body.capturing-png #opr-main-infographic {
             background: #0f172a !important;
@@ -180,7 +170,7 @@
         <div class="flex flex-col items-center text-center px-6">
             <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p class="font-extrabold text-slate-700 text-lg tracking-tight uppercase">Menyusun Visualisasi Dashboard...</p>
-            <p class="text-slate-400 text-sm italic">Membina Infografik & Meter Prestasi</p>
+            <p class="text-slate-400 text-sm italic">Membina Infografik & Perbandingan Waran</p>
         </div>
     </div>
 
@@ -188,13 +178,11 @@
     <div id="opr-modal" class="fixed inset-0 z-[150] hidden overflow-y-auto bg-slate-900/95 backdrop-blur-md p-4 md:p-8">
         <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 relative" id="opr-modal-content">
             <div class="no-print absolute top-6 right-6 flex gap-3 z-50">
-                <!-- TAMBAHAN BARU: Butang Muat Turun Infografik (PNG) -->
                 <button id="btn-download-png" onclick="downloadPNG()" class="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 flex items-center gap-2 px-5 transition-all">
                     <svg id="icon-download" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                     <svg id="icon-loading" class="animate-spin hidden w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span class="text-xs font-bold uppercase tracking-wider" id="text-download">Muat Turun PNG</span>
                 </button>
-                
                 <button onclick="printOPR()" class="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 flex items-center gap-2 px-5 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                     <span class="text-xs font-bold uppercase tracking-wider">Cetak PDF</span>
@@ -221,18 +209,18 @@
                     <h3 class="text-2xl font-black uppercase leading-tight tracking-tight break-words" id="opr-title-display">-</h3>
                 </div>
                 
-                <!-- NEW: Full Infographic Report Area (Tiada Imej Lagi) -->
                 <div class="flex flex-col gap-6">
-                    
                     <!-- Top Banner Infographic -->
                     <div class="w-full bg-gradient-to-br from-slate-800 to-slate-900 text-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-slate-700 relative overflow-hidden">
-                        <!-- Decorative background element -->
                         <div class="absolute top-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[80px] -mr-20 -mt-20"></div>
                         <div class="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-[60px] -ml-20 -mb-20"></div>
 
                         <div class="relative z-10">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
-                                <span id="opr-info-status" class="px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm">Status</span>
+                                <div class="flex gap-3">
+                                    <span id="opr-info-status" class="px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm">Status</span>
+                                    <span id="opr-info-waran" class="px-5 py-2 text-xs text-white font-black uppercase tracking-widest rounded-full border shadow-sm bg-blue-600/80 border-blue-500">Waran</span>
+                                </div>
                                 <span id="opr-info-branch" class="text-xs text-slate-300 font-bold uppercase tracking-widest bg-white/10 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm shadow-sm">UNIT</span>
                             </div>
 
@@ -347,13 +335,18 @@
         <!-- Balanced KPI Grid -->
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-10" id="kpi-container"></div>
 
-        <!-- Analysis Specific Section -->
+        <!-- NEW: Perbandingan Waran 1 & 2 Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 hidden" id="waran-comparison-container">
+            <!-- Injected via JS -->
+        </div>
+
+        <!-- Analysis Specific Section (Syiling) -->
         <div id="ceiling-section" class="mb-10 hidden">
             <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border-b-8 border-blue-600">
                 <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     <div class="max-w-lg">
                         <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-blue-400">SYILING AGIHAN PERUNTUKAN LDP-050202 IAB 2026</span>
-                        <h2 class="text-2xl font-black mt-4 leading-tight uppercase tracking-tight italic">Ringkasan Syiling & Baki</h2>
+                        <h2 class="text-2xl font-black mt-4 leading-tight uppercase tracking-tight italic">Ringkasan Syiling & Baki Keseluruhan</h2>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:w-auto text-center text-white">
                         <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 min-w-[220px]">
@@ -386,7 +379,7 @@
             <div class="lg:col-span-4 space-y-8">
                 <!-- Performance Gauge -->
                 <div id="gauge-container" class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-200 text-center">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Meter Prestasi Perbelanjaan</h3>
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Meter Prestasi Perbelanjaan Keseluruhan</h3>
                     <div style="height: 160px; position: relative;">
                         <canvas id="gaugeChart"></canvas>
                         <div id="gauge-value" class="absolute inset-0 flex items-center justify-center mt-14">
@@ -422,7 +415,6 @@
                 <span class="text-[10px] font-bold text-white uppercase bg-blue-600 px-5 py-2 rounded-full border border-blue-700 tracking-widest shadow-md">Galeri Program</span>
             </div>
             
-            <!-- Grid Infografik (Rekaan Baru - Tiada Flip/Hover, Mesra Cetak) -->
             <div id="gallery-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Infographics populated by JS -->
             </div>
@@ -579,20 +571,26 @@
             stLabel.style.borderColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.4)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(248, 113, 113, 0.4)');
             stLabel.style.backgroundColor = status.label.includes('Tempoh') ? 'rgba(96, 165, 250, 0.15)' : (status.label === 'Tersedia' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)');
             
+            const wLabel = document.getElementById('opr-info-waran');
+            wLabel.innerText = item.waran === 1 ? 'Waran 1' : 'Waran 2';
+            wLabel.className = item.waran === 1 
+                ? 'px-5 py-2 text-xs text-white font-black uppercase tracking-widest rounded-full border shadow-sm bg-blue-600/80 border-blue-500'
+                : 'px-5 py-2 text-xs text-white font-black uppercase tracking-widest rounded-full border shadow-sm bg-indigo-600/80 border-indigo-500';
+
             document.getElementById('opr-info-branch').innerText = item.branch || 'Pusat Berkaitan';
             document.getElementById('opr-info-dates').innerText = `${item.startDate} hingga ${item.endDate} | ${item.location || 'IAB'}`;
             document.getElementById('opr-info-alloc').innerText = formatRM(item.alloc);
             document.getElementById('opr-info-spent').innerText = formatRM(item.spent);
             document.getElementById('opr-info-pax').innerText = `${item.participants || 0} Orang`;
             
-            // KEMAS KINI: Tambah 'crossOrigin' untuk membenarkan tangkapan imej (screenshot)
             const setupExtraImage = (elId, spanId, url) => {
                 const imgEl = document.getElementById(elId);
                 const spanEl = document.getElementById(spanId);
+                if (!imgEl) return;
                 const driveId = getDriveId(url);
                 let hasValidImage = url && url.length > 5 && isValidUrl(url);
 
-                imgEl.setAttribute('crossOrigin', 'anonymous'); // Baris penting untuk elak ralat html2canvas
+                imgEl.setAttribute('crossOrigin', 'anonymous');
 
                 if (hasValidImage) { 
                     imgEl.src = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w800` : url;
@@ -624,7 +622,6 @@
             }, 500);
         }
 
-        // TAMBAHAN BARU: Fungsi Auto-Jana Infografik PNG (Definisi Tinggi)
         async function downloadPNG() {
             const printableArea = document.getElementById('printable-area');
             const btn = document.getElementById('btn-download-png');
@@ -633,31 +630,26 @@
             const textDownload = document.getElementById('text-download');
             
             try {
-                // UI Loading Effect (Supaya pengguna tahu sistem sedang memproses)
                 btn.disabled = true;
                 iconDownload.classList.add('hidden');
                 iconLoading.classList.remove('hidden');
                 textDownload.innerText = 'Menjana Infografik...';
                 
-                // Tambah class untuk buang 'blur' sementara waktu supaya teks tidak ghaib dalam PNG
                 document.body.classList.add('capturing-png');
                 
-                // Mulakan rakaman skrin elemen OPR menggunakan html2canvas
                 const canvas = await html2canvas(printableArea, {
-                    scale: 2, // Resolusi 2x ganda (High Definition)
-                    useCORS: true, // Benarkan imej luar jika ada
-                    allowTaint: false, // Elak ralat jika ada imej yang dikunci ketat
-                    backgroundColor: '#ffffff', // Latar belakang wajib putih
-                    logging: false // Sembunyikan log dari console
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: false, 
+                    backgroundColor: '#ffffff', 
+                    logging: false 
                 });
                 
-                // Tukar canvas menjadi fail Imej PNG
                 const imgData = canvas.toDataURL('image/png');
                 
-                // Cipta pautan muat turun rahsia dan tekan secara automatik
                 const link = document.createElement('a');
                 let programTitle = document.getElementById('opr-info-title').innerText || 'Program';
-                programTitle = programTitle.substring(0, 30).replace(/[^a-zA-Z0-9 ]/g, ""); // Bersihkan nama fail
+                programTitle = programTitle.substring(0, 30).replace(/[^a-zA-Z0-9 ]/g, ""); 
                 link.download = `Infografik_LDP_${programTitle}.png`;
                 link.href = imgData;
                 link.click();
@@ -666,7 +658,6 @@
                 console.error('Ralat ketika menjana PNG:', error);
                 alert('Maaf, pelayar web anda menyekat (block) proses kerana isu keselamatan pautan gambar Google Drive. Sila gunakan fungsi "Cetak PDF" sebagai alternatif.');
             } finally {
-                // Kembalikan antaramuka seperti sedia kala
                 document.body.classList.remove('capturing-png');
                 btn.disabled = false;
                 iconDownload.classList.remove('hidden');
@@ -687,9 +678,16 @@
                         if (rows[1]) liveData.analisis.ceiling = { total: cleanVal(rows[1][5]) };
                         if (rows[3]) liveData.analisis.warrant = { os21: cleanVal(rows[3][3]), os29: cleanVal(rows[3][4]), total: cleanVal(rows[3][5]) };
                         const items = [];
-                        for(let i=6; i<rows.length; i++) {
-                            if(rows[i] && rows[i][2] && !rows[i][2].includes("JUMLAH") && rows[i][2] !== "") {
+                        let currentWaran = 1;
+                        for(let i=0; i<rows.length; i++) {
+                            if (!rows[i]) continue;
+                            const rowStr = rows[i].join(" ").toUpperCase();
+                            if (rowStr.includes("WARAN PERTAMA") || rowStr.includes("FASA 1")) currentWaran = 1;
+                            else if (rowStr.includes("WARAN KEDUA") || rowStr.includes("FASA 2")) currentWaran = 2;
+
+                            if(i >= 6 && rows[i][2] && !rows[i][2].includes("JUMLAH") && rows[i][2] !== "" && !rows[i][2].toUpperCase().includes("WARAN")) {
                                 items.push({
+                                    waran: currentWaran,
                                     name: rows[i][2], alloc: cleanVal(rows[i][5]), spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]), os29: cleanVal(rows[i][4]),
                                     officer: rows[i][13] || "-", branch: rows[i][14] || "-"
@@ -699,9 +697,16 @@
                         liveData.analisis.items = items;
                     } else {
                         const items = [];
+                        let currentWaran = 1;
                         for(let i=3; i<rows.length; i++) {
-                            if(rows[i] && rows[i][2] && rows[i][2] !== "") {
+                            if (!rows[i]) continue;
+                            const rowStr = rows[i].join(" ").toUpperCase();
+                            if (rowStr.includes("WARAN PERTAMA") || rowStr.includes("FASA 1")) currentWaran = 1;
+                            else if (rowStr.includes("WARAN KEDUA") || rowStr.includes("FASA 2")) currentWaran = 2;
+
+                            if(rows[i][2] && rows[i][2] !== "" && !rows[i][2].toUpperCase().includes("WARAN") && rows[i][2].toUpperCase() !== "NAMA KURSUS/BENGKEL" && !rows[i][2].toUpperCase().includes("JUMLAH C")) {
                                 items.push({
+                                    waran: currentWaran,
                                     name: rows[i][2], alloc: cleanVal(rows[i][5]), spent: cleanVal(rows[i][8]),
                                     os21: cleanVal(rows[i][3]), os29: cleanVal(rows[i][4]),
                                     startDate: rows[i][12], endDate: rows[i][13],
@@ -734,11 +739,90 @@
             const mainTable = document.getElementById('main-table');
             mainTable.className = `w-full text-left border-collapse ${isAnalisis ? 'min-w-[800px]' : 'min-w-[1400px]'}`;
 
-            const tAlloc = items.reduce((a, b) => a + b.alloc, 0);
-            const tSpent = items.reduce((a, b) => a + b.spent, 0);
+            const tAlloc = items.reduce((a, b) => a + (b.alloc||0), 0);
+            const tSpent = items.reduce((a, b) => a + (b.spent||0), 0);
             const perc = tAlloc > 0 ? (tSpent/tAlloc*100).toFixed(1) : 0;
             
             const allProgramItems = [...liveData.lead.items, ...liveData.coe.items, ...liveData.assessor.items, ...liveData.pbd.items];
+            const sourceItemsForWaranCalc = isAnalisis ? allProgramItems : items;
+
+            // --- PERBANDINGAN WARAN PERTAMA VS KEDUA ---
+            const validWaranItems = sourceItemsForWaranCalc.filter(i => i.alloc > 0 || i.spent > 0 || (i.name && i.name.trim().length > 3));
+            const w1Items = validWaranItems.filter(i => i.waran === 1);
+            const w2Items = validWaranItems.filter(i => i.waran === 2);
+
+            const w1Alloc = w1Items.reduce((a, b) => a + (b.alloc||0), 0);
+            const w1Spent = w1Items.reduce((a, b) => a + (b.spent||0), 0);
+            const w1Bal = w1Alloc - w1Spent;
+            const w1Perc = w1Alloc > 0 ? (w1Spent/w1Alloc*100).toFixed(1) : 0;
+
+            const w2Alloc = w2Items.reduce((a, b) => a + (b.alloc||0), 0);
+            const w2Spent = w2Items.reduce((a, b) => a + (b.spent||0), 0);
+            const w2Bal = w2Alloc - w2Spent;
+            const w2Perc = w2Alloc > 0 ? (w2Spent/w2Alloc*100).toFixed(1) : 0;
+
+            document.getElementById('waran-comparison-container').classList.remove('hidden');
+            document.getElementById('waran-comparison-container').innerHTML = `
+                <!-- Waran 1 Card -->
+                <div class="bg-gradient-to-br from-blue-900 to-slate-900 rounded-[2.5rem] p-8 text-white shadow-lg border border-blue-800 relative overflow-hidden group hover:shadow-2xl transition-all">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/20 rounded-full blur-[40px] group-hover:bg-blue-500/30 transition-all"></div>
+                    <div class="flex justify-between items-center mb-6 border-b border-blue-800/60 pb-4 relative z-10">
+                        <h3 class="text-xl font-black uppercase tracking-widest flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-800/50 flex items-center justify-center text-blue-300">1</div>
+                            Waran Pertama
+                        </h3>
+                        <span class="bg-blue-800/50 text-blue-300 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-blue-700/50 shadow-inner">${w1Perc}% Belanja</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 text-center relative z-10">
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-blue-300/80 uppercase tracking-widest mb-2">Peruntukan</p>
+                            <p class="text-lg font-black text-white break-words">${formatRM(w1Alloc)}</p>
+                        </div>
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-2">Perbelanjaan</p>
+                            <p class="text-lg font-black text-emerald-400 break-words">${formatRM(w1Spent)}</p>
+                        </div>
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-amber-400/80 uppercase tracking-widest mb-2">Lebihan</p>
+                            <p class="text-lg font-black text-amber-400 break-words">${formatRM(w1Bal)}</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700/50 relative z-10 shadow-inner">
+                        <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: ${Math.min(w1Perc, 100)}%"></div>
+                    </div>
+                </div>
+
+                <!-- Waran 2 Card -->
+                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-[2.5rem] p-8 text-white shadow-lg border border-indigo-800 relative overflow-hidden group hover:shadow-2xl transition-all">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-[40px] group-hover:bg-indigo-500/30 transition-all"></div>
+                    <div class="flex justify-between items-center mb-6 border-b border-indigo-800/60 pb-4 relative z-10">
+                        <h3 class="text-xl font-black uppercase tracking-widest flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-indigo-800/50 flex items-center justify-center text-indigo-300">2</div>
+                            Waran Kedua
+                        </h3>
+                        <span class="bg-indigo-800/50 text-indigo-300 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-indigo-700/50 shadow-inner">${w2Perc}% Belanja</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 text-center relative z-10">
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-indigo-300/80 uppercase tracking-widest mb-2">Peruntukan</p>
+                            <p class="text-lg font-black text-white break-words">${formatRM(w2Alloc)}</p>
+                        </div>
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-2">Perbelanjaan</p>
+                            <p class="text-lg font-black text-emerald-400 break-words">${formatRM(w2Spent)}</p>
+                        </div>
+                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-amber-400/80 uppercase tracking-widest mb-2">Lebihan</p>
+                            <p class="text-lg font-black text-amber-400 break-words">${formatRM(w2Bal)}</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700/50 relative z-10 shadow-inner">
+                        <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: ${Math.min(w2Perc, 100)}%"></div>
+                    </div>
+                </div>
+            `;
+            // --------------------------------------------------------------------
+
             const tOPRReady = allProgramItems.filter(i => (i.objective && i.objective.length > 5)).length;
             const tOPRTotal = allProgramItems.length;
             const warrantTotal = isAnalisis && liveData.analisis.warrant ? liveData.analisis.warrant.total : 0;
@@ -764,30 +848,32 @@
             if (isAnalisis) {
                 gallerySec.classList.remove('hidden');
                 
-                // JANA KAD INFOGRAFIK (REKAAN STATIK, MESRA CETAK, ADA BUTANG LIHAT OPR)
                 document.getElementById('gallery-container').innerHTML = allProgramItems.length ? allProgramItems.map(img => {
                     const driveId = getDriveId(img.imgMain);
                     const hasValidImage = img.imgMain && img.imgMain.length > 5 && isValidUrl(img.imgMain);
                     
                     const pSrc = hasValidImage ? (driveId ? `https://drive.google.com/uc?export=view&id=${driveId}` : img.imgMain) : null;
-                    const fSrc = hasValidImage && driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : null;
                     
                     const status = getOPRStatus(img.endDate, img.objective);
                     const perbelanjaan = img.alloc > 0 ? ((img.spent / img.alloc) * 100).toFixed(0) : 0;
                     
                     let bgImageStyle = pSrc ? `background-image: url('${pSrc}'); background-size: cover; background-position: center;` : `background: linear-gradient(135deg, #1e293b, #0f172a);`;
 
+                    const waranBadgeText = img.waran === 1 ? 'Waran 1' : 'Waran 2';
+                    const waranBadgeClass = img.waran === 1 ? 'bg-blue-600 border-blue-500' : 'bg-indigo-600 border-indigo-500';
+
                     return `
                     <div class="gallery-item bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl border border-slate-200 flex flex-col h-full transition-all">
                         <!-- Top Banner (Image/Gradient) -->
                         <div class="h-28 relative flex-shrink-0 border-b border-slate-100" style="${bgImageStyle}" onerror="this.style.backgroundImage='none'; this.style.background='linear-gradient(135deg, #1e293b, #0f172a)'">
                             <div class="absolute inset-0 bg-slate-900/30"></div>
-                            <div class="absolute top-4 left-4">
+                            <div class="absolute top-4 left-4 flex gap-2">
                                 <span class="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">${status.label}</span>
+                                <span class="px-4 py-1.5 text-white ${waranBadgeClass} text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm border">${waranBadgeText}</span>
                             </div>
                         </div>
                         
-                        <!-- Main Content (White background, Dark text - Sangat Terang Untuk Cetakan) -->
+                        <!-- Main Content -->
                         <div class="p-6 flex flex-col flex-grow justify-between bg-white">
                             <div>
                                 <h4 class="text-slate-900 font-black text-[15px] leading-snug mb-5 break-words line-clamp-3" title="${img.name}">${img.name}</h4>
@@ -826,9 +912,15 @@
                     return `<tr class="hover:bg-slate-50 transition-all text-sm group"><td class="px-8 py-6 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors break-words min-w-[250px] whitespace-normal">${i.name}</td><td class="px-8 py-6 text-left font-bold text-slate-900 uppercase text-[11px]">${i.officer}</td><td class="px-8 py-6 text-left font-black text-blue-600/80 tracking-tight border-l border-slate-50">${i.branch}</td></tr>`;
                 } else {
                     const status = getOPRStatus(i.endDate, i.objective);
+                    const waranBadge = i.waran === 1 
+                        ? `<span class="inline-block mt-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] uppercase font-black border border-blue-200 shadow-sm">Waran Pertama</span>`
+                        : `<span class="inline-block mt-2 px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[9px] uppercase font-black border border-indigo-200 shadow-sm">Waran Kedua</span>`;
+
                     return `
                         <tr class="hover:bg-slate-50 transition-all text-sm group text-justify">
-                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors break-words min-w-[250px] whitespace-normal">${i.name}</td>
+                            <td class="px-8 py-5 font-bold text-slate-700 leading-tight group-hover:text-blue-600 transition-colors break-words min-w-[250px] whitespace-normal">
+                                ${i.name}<br>${waranBadge}
+                            </td>
                             <td class="px-4 py-5 text-center"><span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${status.class}">${status.label}</span></td>
                             <td class="px-4 py-5 text-center text-[11px] font-medium min-w-[100px]">${i.startDate}</td><td class="px-4 py-5 text-center text-[11px] font-medium min-w-[100px]">${i.endDate}</td>
                             <td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os21)}</td><td class="px-6 py-5 text-right font-medium text-slate-400">${formatRM(i.os29)}</td>
